@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using Autofac.Core;
 using Catalog.API.Application.Commands;
+using Catalog.API.Application.Decorators;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -21,7 +22,7 @@ namespace Catalog.API.Infrastructure.AutofacModules
             builder.RegisterAssemblyTypes(typeof(CreateStockCommand).GetTypeInfo().Assembly)
                 .As(o => o.GetInterfaces()
                     .Where(i => i.IsClosedTypeOf(typeof(IAsyncRequestHandler<,>)))
-                    .Select(i => new KeyedService("IAsyncRequestHandler", i)));            
+                    .Select(i => new KeyedService("IAsyncRequestHandler", i))).AsImplementedInterfaces();            
 
             //builder
             //    .RegisterAssemblyTypes(typeof(CreateOrderCommandValidator).GetTypeInfo().Assembly)
@@ -45,10 +46,10 @@ namespace Catalog.API.Infrastructure.AutofacModules
 
 
 
-            //builder.RegisterGenericDecorator(typeof(LogDecorator<,>),
-            //        typeof(IAsyncRequestHandler<,>),
-            //        "IAsyncRequestHandler")
-            //        .Keyed("handlerDecorator", typeof(IAsyncRequestHandler<,>));
+            builder.RegisterGenericDecorator(typeof(LogDecorator<,>),
+                    typeof(IAsyncRequestHandler<,>),
+                    "IAsyncRequestHandler")
+                    .Keyed("handlerDecorator", typeof(IAsyncRequestHandler<,>));
 
             //builder.RegisterGenericDecorator(typeof(ValidatorDecorator<,>),
             //        typeof(IAsyncRequestHandler<,>),

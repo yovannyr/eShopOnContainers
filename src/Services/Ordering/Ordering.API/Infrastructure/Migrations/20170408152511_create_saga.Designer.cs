@@ -8,13 +8,13 @@ using Microsoft.eShopOnContainers.Services.Ordering.Infrastructure;
 namespace Ordering.API.Migrations
 {
     [DbContext(typeof(OrderingContext))]
-    [Migration("20170404140408_create_saga")]
+    [Migration("20170408152511_create_saga")]
     partial class create_saga
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
-                .HasAnnotation("ProductVersion", "1.1.0-rtm-22752")
+                .HasAnnotation("ProductVersion", "1.1.1")
                 .HasAnnotation("SqlServer:Sequence:.orderitemseq", "'orderitemseq', '', '1', '10', '', '', 'Int64', 'False'")
                 .HasAnnotation("SqlServer:Sequence:ordering.buyerseq", "'buyerseq', 'ordering', '1', '10', '', '', 'Int64', 'False'")
                 .HasAnnotation("SqlServer:Sequence:ordering.orderseq", "'orderseq', 'ordering', '1', '10', '', '', 'Int64', 'False'")
@@ -201,12 +201,14 @@ namespace Ordering.API.Migrations
 
             modelBuilder.Entity("Ordering.Domain.SagaData.OrderSagaData", b =>
                 {
-                    b.Property<int>("CorrelationId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
                     b.Property<bool>("Cancelled");
 
                     b.Property<bool>("Completed");
+
+                    b.Property<int>("CorrelationId");
 
                     b.Property<bool>("IsPaymentDone");
 
@@ -214,7 +216,7 @@ namespace Ordering.API.Migrations
 
                     b.Property<string>("Originator");
 
-                    b.HasKey("CorrelationId");
+                    b.HasKey("Id");
 
                     b.ToTable("OrderSaga");
                 });
@@ -238,7 +240,7 @@ namespace Ordering.API.Migrations
                         .WithMany()
                         .HasForeignKey("AddressId");
 
-                    b.HasOne("Microsoft.eShopOnContainers.Services.Ordering.Domain.AggregatesModel.BuyerAggregate.Buyer", "Buyer")
+                    b.HasOne("Microsoft.eShopOnContainers.Services.Ordering.Domain.AggregatesModel.BuyerAggregate.Buyer")
                         .WithMany()
                         .HasForeignKey("BuyerId");
 

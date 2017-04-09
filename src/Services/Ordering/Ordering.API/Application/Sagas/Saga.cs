@@ -9,15 +9,19 @@ namespace Ordering.API.Application.Sagas
 {
     public abstract class Saga<TEntity> where TEntity : class, ISagaEntity
     {
-        private DbContext _context;
-        public Saga(DbContext ctx)
+        public Saga()
         {
-            _context = ctx; 
         }
 
-        protected TEntity FindById(int id)
+        protected TEntity FindById(int id, DbContext context)
         {
-            return _context.Set<TEntity>().Where(x => x.CorrelationId == id).SingleOrDefault();
+            return context.Set<TEntity>().Where(x => x.CorrelationId == id).SingleOrDefault();
+        }
+
+        protected bool ExistSaga(int sagaId, DbContext context)
+        {
+            var saga = FindById(sagaId, context);
+            return saga != null;
         }
 
         protected void MarkAsCompleted(TEntity item)
@@ -30,14 +34,20 @@ namespace Ordering.API.Application.Sagas
             item.Cancelled = true;
         }
 
-        protected void Add(TEntity item)
+        protected void AddSagaState(TEntity item, DbContext context)
         {
-            _context.Add(item);
+            context.Add(item);
         }
 
-        protected void Save()
+        protected void UpdateSagaState(TEntity item, DbContext context)
         {
-            _context.SaveChanges();
+            context.Update(item);
+        }
+
+        protected async Task<bool> SaveChangesAsync(DbContext context)
+        {
+            var result = await context.SaveChangesAsync();
+            return result > 0;
         }
     }
 }

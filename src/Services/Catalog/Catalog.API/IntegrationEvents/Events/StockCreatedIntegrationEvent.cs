@@ -13,12 +13,12 @@ namespace Catalog.API.IntegrationEvents.Events
     {
         public int OrderId { get; private set; }
 
-        public bool Result { get; private set; }
+        public bool IsSuccess { get; private set; }
 
         public StockCreatedIntegrationEvent(int orderId, bool result)
         {
             OrderId = orderId;
-            Result = result;
+            IsSuccess = result;
         }
     }
 }

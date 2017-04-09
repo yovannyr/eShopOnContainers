@@ -36,9 +36,10 @@ namespace Catalog.API.Application.Commands
 
         public async Task<bool> Handle(CreateStockCommand message)
         {
-            var productsToUpdate = await _catalogContext.CatalogItems
-                .Where(c => message.OrderItems.Any(i => i.ProductId == c.Id))
-                .ToListAsync();
+            var ids = message.OrderItems.Select(i => i.ProductId);
+            var productsToUpdate = _catalogContext.CatalogItems
+                .Where(c => ids.Contains(c.Id))
+                .ToList();
 
             // Remove number of products provided from stock
             productsToUpdate.ForEach((productToUpdate) => {
@@ -46,6 +47,7 @@ namespace Catalog.API.Application.Commands
                     if(item.ProductId == productToUpdate.Id)
                     {
                         productToUpdate.RemoveStock(item.Units);
+                        _catalogContext.Update(productToUpdate);
                         break;
                     }
                 };
@@ -53,8 +55,9 @@ namespace Catalog.API.Application.Commands
             var result = await _catalogContext.SaveChangesAsync();
             var isSuccess = result > 0;
 
-            // Send Integration event to ordering api in order to update order saga status
-            var evt = new StockCreatedIntegrationEvent(message.OrderId, isSuccess);
+            // Send Integration event to ordering api in order to update order saga status            
+            var evt = new StockCreatedIntegrationEvent(message.OrderNumber, isSuccess);
+            await _catalogIntegrationEventService.SaveEventAndCatalogContextChangesAsync(evt);
             await _catalogIntegrationEventService.PublishThroughEventBusAsync(evt);
             return isSuccess;
         }

@@ -45,7 +45,7 @@ namespace Payment.API
                 });
             });
 
-            services.AddSingleton<IEventBus>(provider => new EventBusRabbitMQ(Configuration["EventBusConnection"]));
+            services.AddSingleton<IEventBus>(new EventBusRabbitMQ(Configuration["EventBusConnection"]));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -26,12 +26,12 @@
                 connection.Open();
 
                 var result = await connection.QueryAsync<dynamic>(
-                   @"select o.[Id] as ordernumber,o.OrderDate as date, os.Name as status, 
+                   @"select o.[Id] as ordernumber,o.OrderDate as date, os.Name as status,
                         oi.ProductName as productname, oi.Units as units, oi.UnitPrice as unitprice, oi.PictureUrl as pictureurl, 
 						a.Street as street, a.City as city, a.Country as country, a.State as state, a.ZipCode as zipcode
                         FROM ordering.Orders o
                         INNER JOIN ordering.Address a ON o.AddressId = a.Id 
-                        LEFT JOIN ordering.Orderitems oi ON o.Id = oi.orderid 
+                        LEFT JOIN ordering.Orderitems oi ON o.Id = oi.orderid                         
                         LEFT JOIN ordering.orderstatus os on o.OrderStatusId = os.Id
                         WHERE o.Id=@id"
                         , new { id }
@@ -50,11 +50,12 @@
             {
                 connection.Open();
 
-                return await connection.QueryAsync<dynamic>(@"SELECT o.[Id] as ordernumber,o.[OrderDate] as [date],os.[Name] as [status],SUM(oi.units*oi.unitprice) as total
+                return await connection.QueryAsync<dynamic>(@"SELECT o.[Id] as ordernumber,o.[OrderDate] as [date],os.[Name] as [status],SUM(oi.units*oi.unitprice) as total, osaga.[Completed] as iscompleted
                      FROM [ordering].[Orders] o
                      LEFT JOIN[ordering].[orderitems] oi ON  o.Id = oi.orderid 
                      LEFT JOIN[ordering].[orderstatus] os on o.OrderStatusId = os.Id
-                     GROUP BY o.[Id], o.[OrderDate], os.[Name]");
+                     LEFT JOIN[dbo].[ordersaga] osaga ON o.Id = osaga.CorrelationId
+                     GROUP BY o.[Id], o.[OrderDate], os.[Name], osaga.[Completed]");
             }
         }
 

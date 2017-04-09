@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.eShopOnContainers.Services.Ordering.Domain.AggregatesModel.OrderAggregate;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,16 +21,35 @@ namespace Ordering.API.Application.Commands
     public class ProcessOrderCommand
         : IAsyncRequest<bool>
     {
-        [DataMember]
-        public Guid RequestId { get; private set; }
 
         [DataMember]
-        public int OrderId { get; private set; }
+        public int OrderNumber { get; private set; }
 
-        public ProcessOrderCommand(Guid requestId, int orderId)
+        [DataMember]
+        private readonly List<OrderItemDTO> _orderItems;
+
+        [DataMember]
+        public IEnumerable<OrderItemDTO> OrderItems => _orderItems;
+
+        public ProcessOrderCommand(int orderId)
         {
-            RequestId = requestId;
-            OrderId = orderId;
-        }        
+            OrderNumber = orderId;
+            _orderItems = new List<OrderItemDTO>();
+        }
+
+        public class OrderItemDTO
+        {
+            public int ProductId { get; set; }
+
+            public string ProductName { get; set; }
+
+            public decimal UnitPrice { get; set; }
+
+            public decimal Discount { get; set; }
+
+            public int Units { get; set; }
+
+            public string PictureUrl { get; set; }
+        }
     }
 }

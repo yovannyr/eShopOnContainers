@@ -7,6 +7,7 @@ namespace Ordering.Domain.SagaData
 {
     public interface ISagaEntity 
     {
+        int Id { get; set; }
         int CorrelationId { get; set; }
         string Originator { get; set; }
         bool Completed { get; set; }

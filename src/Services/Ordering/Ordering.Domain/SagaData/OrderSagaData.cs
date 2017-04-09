@@ -6,6 +6,7 @@ namespace Ordering.Domain.SagaData
 {
     public class OrderSagaData : ISagaEntity
     {
+        public int Id { get; set; }
         public int CorrelationId { get; set; }
         public string Originator { get; set; }
         public bool IsPaymentDone { get; set; }

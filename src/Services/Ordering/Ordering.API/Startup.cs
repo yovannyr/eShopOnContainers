@@ -3,10 +3,11 @@
     using AspNetCore.Http;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
-    using global::Ordering.API.Application.IntegrationEvents.Events;
+    using global::Ordering.API;
     using global::Ordering.API.Application.Sagas;
     using global::Ordering.API.Infrastructure.Middlewares;
     using global::Ordering.API.IntegrationEvents;
+    using global::Ordering.API.IntegrationEvents.Events;
     using Infrastructure;
     using Infrastructure.Auth;
     using Infrastructure.AutofacModules;
@@ -19,6 +20,7 @@
     using Microsoft.eShopOnContainers.BuildingBlocks.EventBusRabbitMQ;
     using Microsoft.eShopOnContainers.BuildingBlocks.IntegrationEventLogEF;
     using Microsoft.eShopOnContainers.BuildingBlocks.IntegrationEventLogEF.Services;
+    using Microsoft.eShopOnContainers.BuildingBlocks.Resilience.HttpResilience;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.HealthChecks;
@@ -51,6 +53,7 @@
 
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
+            
             // Add framework services.
             services.AddMvc(options =>
             {
@@ -58,6 +61,7 @@
             }).AddControllersAsServices();  //Injecting Controllers themselves thru DI
                                             //For further info see: http://docs.autofac.org/en/latest/integration/aspnetcore.html#controllers-as-services
 
+            services.Configure<Settings>(Configuration);
 
             services.AddHealthChecks(checks =>
             {
@@ -100,19 +104,22 @@
                     .AllowCredentials());
             });
 
+            
+
+
             // Add application services.
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddTransient<IHttpClient, StandardHttpClient>();
             services.AddTransient<IIdentityService, IdentityService>();
             services.AddTransient<Func<DbConnection, IIntegrationEventLogService>>(
                 sp => (DbConnection c) => new IntegrationEventLogService(c));            
-            var serviceProvider = services.BuildServiceProvider();
-            services.AddTransient<IOrderingIntegrationEventService, OrderingIntegrationEventService>();
-            services.AddSingleton<IEventBus>(new EventBusRabbitMQ(Configuration["EventBusConnection"]));
+            var serviceProvider = services.BuildServiceProvider();            
 
             // Integration Events
             services.AddTransient<IIntegrationEventHandler<OrderPaidIntegrationEvent>, OrderingSaga>();
-            services.AddTransient<IIntegrationEventHandler<StockCreatedIntegrationEvent>, OrderingSaga>();
-
+            services.AddTransient<IIntegrationEventHandler<StockCreatedIntegrationEvent>, OrderingSaga>();            
+            services.AddTransient<IOrderingIntegrationEventService, OrderingIntegrationEventService>();
+            services.AddSingleton<IEventBus>(new EventBusRabbitMQ(Configuration["EventBusConnection"]));
 
             services.AddOptions();
 

@@ -11,6 +11,7 @@ namespace Microsoft.eShopOnContainers.WebMVC.Services
         Task<List<Order>> GetMyOrders(ApplicationUser user);
         Task<Order> GetOrder(ApplicationUser user, string orderId);
         Task CreateOrder(Order order);
+        Task CreateProcessOrder(Order order, string requestId);
         Order MapUserInfoIntoOrder(ApplicationUser user, Order order);
         void OverrideUserInfoIntoOrder(Order original, Order destination);
     }

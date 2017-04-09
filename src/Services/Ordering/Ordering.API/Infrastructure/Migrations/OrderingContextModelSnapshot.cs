@@ -13,7 +13,7 @@ namespace Ordering.API.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
             modelBuilder
-                .HasAnnotation("ProductVersion", "1.1.0-rtm-22752")
+                .HasAnnotation("ProductVersion", "1.1.1")
                 .HasAnnotation("SqlServer:Sequence:.orderitemseq", "'orderitemseq', '', '1', '10', '', '', 'Int64', 'False'")
                 .HasAnnotation("SqlServer:Sequence:ordering.buyerseq", "'buyerseq', 'ordering', '1', '10', '', '', 'Int64', 'False'")
                 .HasAnnotation("SqlServer:Sequence:ordering.orderseq", "'orderseq', 'ordering', '1', '10', '', '', 'Int64', 'False'")
@@ -200,12 +200,14 @@ namespace Ordering.API.Migrations
 
             modelBuilder.Entity("Ordering.Domain.SagaData.OrderSagaData", b =>
                 {
-                    b.Property<int>("CorrelationId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
                     b.Property<bool>("Cancelled");
 
                     b.Property<bool>("Completed");
+
+                    b.Property<int>("CorrelationId");
 
                     b.Property<bool>("IsPaymentDone");
 
@@ -213,7 +215,7 @@ namespace Ordering.API.Migrations
 
                     b.Property<string>("Originator");
 
-                    b.HasKey("CorrelationId");
+                    b.HasKey("Id");
 
                     b.ToTable("OrderSaga");
                 });

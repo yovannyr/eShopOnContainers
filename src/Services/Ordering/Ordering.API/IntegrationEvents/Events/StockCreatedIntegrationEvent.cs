@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Ordering.API.Application.IntegrationEvents.Events
+namespace Ordering.API.IntegrationEvents.Events
 {
     // Integration Events notes: 
     // An Event is “something that has happened in the past”, therefore its name has to be   
@@ -13,12 +13,12 @@ namespace Ordering.API.Application.IntegrationEvents.Events
     {
         public int OrderId { get; private set; }
 
-        public bool Result { get; private set; }
+        public bool IsSuccess { get; private set; }
 
-        public StockCreatedIntegrationEvent(int orderId, bool result)
+        public StockCreatedIntegrationEvent(int orderId, bool isSuccess)
         {
             OrderId = orderId;
-            Result = result;
+            IsSuccess = isSuccess;
         }
     }
 }

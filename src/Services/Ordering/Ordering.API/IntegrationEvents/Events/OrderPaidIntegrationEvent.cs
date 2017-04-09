@@ -4,15 +4,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Payment.API.IntegrationEvents.Events
+namespace Ordering.API.IntegrationEvents.Events
 {
-    public class OrderStockProvidedIntegrationEvent : IntegrationEvent
+    public class OrderPaidIntegrationEvent : IntegrationEvent
     {
         public int OrderId { get; private set; }
 
-        public OrderStockProvidedIntegrationEvent(int orderId)
+        public bool IsSuccess { get; private set; }
+
+        public OrderPaidIntegrationEvent(int orderId, bool isSuccess)
         {
             OrderId = orderId;
+            IsSuccess = isSuccess;
         }
     }
 }

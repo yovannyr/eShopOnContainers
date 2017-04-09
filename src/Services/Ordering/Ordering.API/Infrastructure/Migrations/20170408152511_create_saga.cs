@@ -13,17 +13,18 @@ namespace Ordering.API.Migrations
                 name: "OrderSaga",
                 columns: table => new
                 {
-                    CorrelationId = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Cancelled = table.Column<bool>(nullable: false),
                     Completed = table.Column<bool>(nullable: false),
+                    CorrelationId = table.Column<int>(nullable: false),
                     IsPaymentDone = table.Column<bool>(nullable: false),
                     IsStockProvided = table.Column<bool>(nullable: false),
                     Originator = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_OrderSaga", x => x.CorrelationId);
+                    table.PrimaryKey("PK_OrderSaga", x => x.Id);
                 });
         }
 

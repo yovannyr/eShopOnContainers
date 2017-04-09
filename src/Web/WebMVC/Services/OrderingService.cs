@@ -92,6 +92,25 @@ namespace Microsoft.eShopOnContainers.WebMVC.Services
             response.EnsureSuccessStatusCode();
         }
 
+        async public Task CreateProcessOrder(Order order, string requestId)
+        {
+            var context = _httpContextAccesor.HttpContext;
+            var token = await context.Authentication.GetTokenAsync("access_token");
+
+            _apiClient.Inst.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            _apiClient.Inst.DefaultRequestHeaders.Add("x-requestid", requestId);
+
+            var ordersUrl = $"{_remoteServiceBaseUrl}/process";
+            SetFakeIdToProducts(order);
+
+            var response = await _apiClient.PostAsync(ordersUrl, order);
+
+            if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
+                throw new Exception("Error creating order, try later");
+
+            response.EnsureSuccessStatusCode();
+        }
+
         public void OverrideUserInfoIntoOrder(Order original, Order destination)
         {
             destination.City = original.City;

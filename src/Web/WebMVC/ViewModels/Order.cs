@@ -17,6 +17,8 @@ namespace Microsoft.eShopOnContainers.WebMVC.ViewModels
 
         public string Status { get; set; }
 
+        public bool? IsCompleted { get; set; }
+
         public decimal Total {get;set;}
 
         [Required]

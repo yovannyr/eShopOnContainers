@@ -156,8 +156,8 @@ namespace Microsoft.eShopOnContainers.Services.Ordering.Infrastructure
             var navigation = orderConfiguration.Metadata.FindNavigation(nameof(Order.OrderItems));
             // DDD Patterns comment:
             //Set as Field (New since EF 1.1) to access the OrderItem collection property through its field
-            navigation.SetPropertyAccessMode(PropertyAccessMode.Field);
-
+            navigation.SetPropertyAccessMode(PropertyAccessMode.Field);            
+            
             orderConfiguration.HasOne(o => o.PaymentMethod)
                 .WithMany()
                 .HasForeignKey("PaymentMethodId")
@@ -243,7 +243,10 @@ namespace Microsoft.eShopOnContainers.Services.Ordering.Infrastructure
         {
             orderSagaDataConfiguration.ToTable("OrderSaga");
 
-            orderSagaDataConfiguration.HasKey(e => e.CorrelationId);
+            orderSagaDataConfiguration.HasKey(e => e.Id);
+
+            orderSagaDataConfiguration.Property(e => e.CorrelationId)
+                .IsRequired();
         }
 
         public async Task<bool> SaveEntitiesAsync(CancellationToken cancellationToken = default(CancellationToken))

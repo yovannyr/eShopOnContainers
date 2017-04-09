@@ -10,9 +10,12 @@ namespace Payment.API.IntegrationEvents.Events
     {
         public int OrderId { get; private set; }
 
-        public OrderPaidIntegrationEvent(int orderId)
+        public bool IsSuccess { get; private set; }
+
+        public OrderPaidIntegrationEvent(int orderId, bool result)
         {
             OrderId = orderId;
+            IsSuccess = result;
         }
     }
 }

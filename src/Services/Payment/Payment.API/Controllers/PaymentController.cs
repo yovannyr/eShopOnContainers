@@ -9,7 +9,7 @@ using Payment.API.IntegrationEvents.Events;
 
 namespace Payment.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     public class PaymentController : Controller
     {
         private readonly IEventBus _eventBus;
@@ -33,11 +33,12 @@ namespace Payment.API.Controllers
             return "value";
         }
 
-        // POST api/payment
+        // POST api/payment/1
+        [Route("{orderId}")]
         [HttpPost]
-        public void Post([FromBody]OrderPayment orderPayment)
+        public void Post(int orderId)
         {
-            var evt = new OrderPaidIntegrationEvent(orderPayment.OrderId);
+            var evt = new OrderPaidIntegrationEvent(orderId, true);
             _eventBus.Publish(evt);
         }
 

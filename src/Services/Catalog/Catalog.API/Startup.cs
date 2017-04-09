@@ -113,7 +113,7 @@
             var container = new ContainerBuilder();
             container.Populate(services);
             container.RegisterModule(new MediatorModule());
-
+            container.RegisterModule(new ApplicationModule());
             return new AutofacServiceProvider(container.Build());
 
         }
@@ -134,7 +134,7 @@
 
             var context = (CatalogContext)app
                         .ApplicationServices.GetService(typeof(CatalogContext));
-
+            
             WaitForSqlAvailability(context, loggerFactory);
             //Seed Data
             CatalogContextSeed.SeedAsync(app, loggerFactory)

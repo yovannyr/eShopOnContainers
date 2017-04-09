@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.eShopOnContainers.Services.Ordering.API.Application.Commands;
 using Microsoft.eShopOnContainers.Services.Ordering.API.Application.Queries;
 using Microsoft.eShopOnContainers.Services.Ordering.API.Infrastructure.Services;
+using Ordering.API.Application.Commands;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -42,6 +43,26 @@ namespace Microsoft.eShopOnContainers.Services.Ordering.API.Controllers
                 // that aren't still updated. When all clients were updated this could be removed.
                 result = await _mediator.SendAsync(command);
             }
+
+            if (result)
+            {
+                return Ok();
+            }
+
+            return BadRequest();
+        }
+
+        [Route("process")]
+        [HttpPost]
+        public async Task<IActionResult> ProcessOrder([FromBody]ProcessOrderCommand command, [FromHeader(Name = "x-requestid")] string requestId)
+        {
+            bool result = false;
+
+            if (Guid.TryParse(requestId, out Guid guid) && guid != Guid.Empty)
+            {
+                var requestProcessOrder = new IdentifiedCommand<ProcessOrderCommand, bool>(command, guid);
+                result = await _mediator.SendAsync(requestProcessOrder);
+            }            
 
             if (result)
             {

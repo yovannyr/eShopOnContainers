@@ -18,7 +18,7 @@ namespace Catalog.API.Application.Commands
         : IAsyncRequest<bool>
     {
         [DataMember]
-        public int OrderId { get; private set; }
+        public int OrderNumber { get; private set; }
 
         [DataMember]
         private readonly List<OrderItemDTO> _orderItems;
@@ -33,7 +33,7 @@ namespace Catalog.API.Application.Commands
 
         public CreateStockCommand(int orderId)
         {
-            OrderId = orderId;
+            OrderNumber = orderId;
             _orderItems = new List<OrderItemDTO>();
         }        
 
