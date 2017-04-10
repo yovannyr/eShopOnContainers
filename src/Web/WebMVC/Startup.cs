@@ -15,7 +15,8 @@ using Microsoft.AspNetCore.Http;
 using System.Threading;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.HealthChecks;
-using Microsoft.eShopOnContainers.BuildingBlocks.Resilience.HttpResilience;
+using Microsoft.eShopOnContainers.BuildingBlocks.Resilience.Http;
+using Microsoft.eShopOnContainers.WebMVC.Infrastructure;
 
 namespace Microsoft.eShopOnContainers.WebMVC
 {
@@ -43,12 +44,20 @@ namespace Microsoft.eShopOnContainers.WebMVC
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDataProtection(opts =>
+            {
+                opts.ApplicationDiscriminator = "eshop.webmvc";
+            });
+
             services.AddMvc();
             services.Configure<AppSettings>(Configuration);
 
             services.AddHealthChecks(checks =>
             {
-                checks.AddValueTaskCheck("HTTP Endpoint", () => new ValueTask<IHealthCheckResult>(HealthCheckResult.Healthy("Ok")));
+                checks.AddUrlCheck(Configuration["CatalogUrl"]);
+                checks.AddUrlCheck(Configuration["OrderingUrl"]);
+                checks.AddUrlCheck(Configuration["BasketUrl"]);
+                checks.AddUrlCheck(Configuration["IdentityUrl"]);
             });
 
             // Add application services.
@@ -60,19 +69,14 @@ namespace Microsoft.eShopOnContainers.WebMVC
 
             if (Configuration.GetValue<string>("UseResilientHttp") == bool.TrueString)
             {
-                services.AddSingleton(
-                    new List<ResiliencePolicy>
-                    {
-                        ResiliencePolicyFactory.CreateRetryPolicy(6, 2, true),
-                        ResiliencePolicyFactory.CreateCiscuitBreakerPolicy(5, 1)
-                    });
-                services.AddTransient<IHttpClient, ResilientHttpClient>();
+                services.AddTransient<IResilientHttpClientFactory, ResilientHttpClientFactory>();
+                services.AddTransient<IHttpClient, ResilientHttpClient>(sp => sp.GetService<IResilientHttpClientFactory>().CreateResilientHttpClient());
             }
             else
             {
                 services.AddTransient<IHttpClient, StandardHttpClient>();
             }
-        }
+        }        
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
@@ -115,14 +119,9 @@ namespace Microsoft.eShopOnContainers.WebMVC
                 ResponseType = "code id_token", 
                 SaveTokens = true,
                 GetClaimsFromUserInfoEndpoint = true,
-                RequireHttpsMetadata = false, 
+                RequireHttpsMetadata = false,
+                Scope = { "openid", "profile", "orders", "basket" }
             };
-
-            oidcOptions.Scope.Clear();
-            oidcOptions.Scope.Add("openid");
-            oidcOptions.Scope.Add("profile");
-            oidcOptions.Scope.Add("orders");
-            oidcOptions.Scope.Add("basket");
 
             //Wait untill identity service is ready on compose. 
             app.UseOpenIdConnectAuthentication(oidcOptions);

@@ -25,6 +25,7 @@
     using global::Catalog.API.Infrastructure.AutofacModules;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
+    using System.Threading.Tasks;
 
     public class Startup
     {
