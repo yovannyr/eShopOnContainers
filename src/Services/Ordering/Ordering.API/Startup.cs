@@ -20,7 +20,7 @@
     using Microsoft.eShopOnContainers.BuildingBlocks.EventBusRabbitMQ;
     using Microsoft.eShopOnContainers.BuildingBlocks.IntegrationEventLogEF;
     using Microsoft.eShopOnContainers.BuildingBlocks.IntegrationEventLogEF.Services;
-    using Microsoft.eShopOnContainers.BuildingBlocks.Resilience.HttpResilience;
+    using Microsoft.eShopOnContainers.BuildingBlocks.Resilience.Http;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.HealthChecks;

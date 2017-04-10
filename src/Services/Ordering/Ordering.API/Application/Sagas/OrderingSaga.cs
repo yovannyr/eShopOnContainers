@@ -1,10 +1,8 @@
 ﻿using Autofac.Features.OwnedInstances;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.eShopOnContainers.BuildingBlocks.EventBus.Abstractions;
-using Microsoft.eShopOnContainers.BuildingBlocks.Resilience.HttpResilience;
+using Microsoft.eShopOnContainers.BuildingBlocks.Resilience.Http;
 using Microsoft.eShopOnContainers.Services.Ordering.API.Application.Commands;
-using Microsoft.eShopOnContainers.Services.Ordering.Domain.AggregatesModel.OrderAggregate;
 using Microsoft.eShopOnContainers.Services.Ordering.Infrastructure;
 using Microsoft.eShopOnContainers.Services.Ordering.Infrastructure.Idempotency;
 using Microsoft.Extensions.Options;
@@ -13,7 +11,6 @@ using Ordering.API.IntegrationEvents.Events;
 using Ordering.Domain.Events;
 using Ordering.Domain.SagaData;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Ordering.API.Application.Sagas
