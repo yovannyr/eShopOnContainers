@@ -20,6 +20,7 @@
             builder.Entity<CatalogBrand>(ConfigureCatalogBrand);
             builder.Entity<CatalogType>(ConfigureCatalogType);
             builder.Entity<CatalogItem>(ConfigureCatalogItem);
+            builder.Entity<ClientRequest>(ConfigureRequests);
         }     
 
         void ConfigureCatalogItem(EntityTypeBuilder<CatalogItem> builder)
@@ -77,6 +78,14 @@
             builder.Property(cb => cb.Type)
                 .IsRequired()
                 .HasMaxLength(100);
+        }
+
+        private void ConfigureRequests(EntityTypeBuilder<ClientRequest> requestConfiguration)
+        {
+            requestConfiguration.ToTable("Requests");
+            requestConfiguration.HasKey(cr => cr.Id);
+            requestConfiguration.Property(cr => cr.Name).IsRequired();
+            requestConfiguration.Property(cr => cr.Time).IsRequired();
         }
     }
 }

@@ -1,5 +1,8 @@
-﻿using MediatR;
+﻿using Autofac;
+using Autofac.Features.OwnedInstances;
+using MediatR;
 using Microsoft.eShopOnContainers.Services.Ordering.Domain.AggregatesModel.OrderAggregate;
+using Microsoft.eShopOnContainers.Services.Ordering.Infrastructure;
 using Microsoft.Extensions.Logging;
 using Ordering.Domain.Events;
 using System;
@@ -10,12 +13,13 @@ namespace Ordering.API.Application.DomainEventHandlers.OrderCompleted
     public class OrderCompletedEventHandler
                    : IAsyncNotificationHandler<OrderCompletedEvent>
     {
-        private readonly IOrderRepository _orderRepository;
+        private readonly ILifetimeScope _lifetimeScope;
         private readonly ILoggerFactory _logger;
+
         public OrderCompletedEventHandler(
-            IOrderRepository orderRepository, ILoggerFactory logger)
+            ILifetimeScope lifetimeScope, ILoggerFactory logger)
         {
-            _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));            
+            _lifetimeScope = lifetimeScope ?? throw new ArgumentNullException(nameof(lifetimeScope));            
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -24,11 +28,16 @@ namespace Ordering.API.Application.DomainEventHandlers.OrderCompleted
         // then it updates the state of the order to completed status
         public async Task Handle(OrderCompletedEvent orderCompletedEvent)
         {
-            // TODO:
-            //var orderToUpdate = await _orderRepository.GetAsync(orderCompletedEvent.OrderId);
-            //orderToUpdate.SetOrderStatusId(OrderStatus.Shipped.Id);
-            //_orderRepository.Update(orderToUpdate);
-            //await _orderRepository.UnitOfWork.SaveChangesAsync();
+            // A new lifetimescope must be created for OrderingContext since it is 
+            // disposed when event is received
+            using (var scope = _lifetimeScope.BeginLifetimeScope())
+            {
+                var orderRepository = scope.Resolve<IOrderRepository>();
+                var orderToUpdate = await orderRepository.GetAsync(orderCompletedEvent.OrderId);
+                orderToUpdate.SetOrderStatusId(OrderStatus.Shipped.Id);
+                orderRepository.Update(orderToUpdate);
+                await orderRepository.UnitOfWork.SaveChangesAsync();
+            }                
 
             _logger.CreateLogger(nameof(OrderCompletedEventHandler))
                 .LogTrace($"Thre process Order with Id: {orderCompletedEvent.OrderId} has been successfully completed and is ready to ship");

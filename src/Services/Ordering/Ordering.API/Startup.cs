@@ -4,7 +4,6 @@
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using global::Ordering.API;
-    using global::Ordering.API.Application.Sagas;
     using global::Ordering.API.Infrastructure.Middlewares;
     using global::Ordering.API.IntegrationEvents;
     using global::Ordering.API.IntegrationEvents.Events;
@@ -115,9 +114,7 @@
                 sp => (DbConnection c) => new IntegrationEventLogService(c));            
             var serviceProvider = services.BuildServiceProvider();            
 
-            // Integration Events
-            services.AddTransient<IIntegrationEventHandler<OrderPaidIntegrationEvent>, OrderingSaga>();
-            services.AddTransient<IIntegrationEventHandler<StockCreatedIntegrationEvent>, OrderingSaga>();            
+            // Integration Events            
             services.AddTransient<IOrderingIntegrationEventService, OrderingIntegrationEventService>();
             services.AddSingleton<IEventBus>(new EventBusRabbitMQ(Configuration["EventBusConnection"]));
 

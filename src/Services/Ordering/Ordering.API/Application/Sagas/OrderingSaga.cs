@@ -9,6 +9,7 @@ using Microsoft.Extensions.Options;
 using Ordering.API.Application.Commands;
 using Ordering.API.IntegrationEvents.Events;
 using Ordering.Domain.Events;
+using Ordering.Domain.Exceptions;
 using Ordering.Domain.SagaData;
 using System;
 using System.Threading.Tasks;
@@ -68,7 +69,8 @@ namespace Ordering.API.Application.Sagas
                     {
                         CorrelationId = command.OrderNumber,
                         Originator = nameof(ProcessOrderCommand)
-                    }, ctx);
+                    }, 
+                    ctx);
 
                     await SaveChangesAsync(ctx);
                 }
@@ -94,15 +96,19 @@ namespace Ordering.API.Application.Sagas
         /// <returns></returns>
         public async Task Handle(OrderPaidIntegrationEvent @event)
         {
-            // A new OrderingContext object must be created since it is 
-            // disposed when integration events are received
+            // A new lifetimescope must be created for OrderingContext since it is 
+            // disposed when event is received
             using (var ctx = _dbContextFactory().Value)
             {
                 var orderSaga = FindById(@event.OrderId, ctx);
+                if (orderSaga is null)
+                {
+                    throw new OrderingDomainException("Not able to process Order Paid event.Reason: no valid orderId");
+                }
+                
                 orderSaga.IsPaymentDone = @event.IsSuccess;
                 UpdateSagaState(orderSaga, ctx);
-                await CheckForSagaCompletionAndUpdate(orderSaga);
-                await SaveChangesAsync(ctx);
+                await CheckForSagaCompletionAndSaveAsync(orderSaga, ctx);
             }
         }
 
@@ -117,20 +123,31 @@ namespace Ordering.API.Application.Sagas
             using (var ctx = _dbContextFactory().Value)
             {
                 var orderSaga = FindById(@event.OrderId, ctx);
+                if (orderSaga is null)
+                {
+                    throw new OrderingDomainException("Not able to process Stock Requested event.Reason: no valid orderId");
+                }
+                
                 orderSaga.IsStockProvided = @event.IsSuccess;
                 UpdateSagaState(orderSaga, ctx);
-                await CheckForSagaCompletionAndUpdate(orderSaga);
-                await SaveChangesAsync(ctx);
+                await CheckForSagaCompletionAndSaveAsync(orderSaga, ctx);                
             }
         }
 
-        private async Task CheckForSagaCompletionAndUpdate(OrderSagaData saga)
+        private async Task CheckForSagaCompletionAndSaveAsync(OrderSagaData saga, OrderingContext ctx)
         {
             if(saga.IsPaymentDone && saga.IsStockProvided)
             {
-                MarkAsCompleted(saga);
+                // Set saga as completed
+                await MarkAsCompletedAndSaveAsync(saga, ctx); 
+                
+                // Send domain event to update order's state
                 var orderCompletedEvt = new OrderCompletedEvent(saga.CorrelationId);
                 await _mediator.PublishAsync(orderCompletedEvt);
+            }
+            else
+            {
+                await SaveChangesAsync(ctx);
             }
         }
     }

@@ -15,8 +15,8 @@
                 <section class="esh-orders-title col-xs-2">Order number</section>
                 <section class="esh-orders-title col-xs-4">Date</section>
                 <section class="esh-orders-title col-xs-2">Total</section>
-                <section class="esh-orders-title col-xs-1"></section>
-                <section class="esh-orders-title col-xs-3"></section>
+                <section class="esh-orders-title col-xs-2">Status</section>
+                <section class="esh-orders-title col-xs-2"></section>
             </article>
 
             @foreach (var item in Model)
@@ -25,7 +25,8 @@
                     <section class="esh-orders-item col-xs-2">@Html.DisplayFor(modelItem => item.OrderNumber)</section>
                     <section class="esh-orders-item col-xs-4">@Html.DisplayFor(modelItem => item.Date)</section>
                     <section class="esh-orders-item col-xs-2">$ @Html.DisplayFor(modelItem => item.Total)</section>
-                    <section class="esh-orders-item col-xs-3">
+                    <section class="esh-orders-item col-xs-2">@Html.DisplayFor(modelItem => item.Status)</section>
+                    <section class="esh-orders-item col-xs-2">
                         @if((!item.IsCompleted.HasValue) || (!item.IsCompleted.Value))
                         {
                             <a class="btn esh-orders_process-placeOrder" asp-controller="OrderManagement" asp-action="Process" asp-route-orderId="@item.OrderNumber">[ Process ]</a>
