@@ -18,7 +18,7 @@ namespace Ordering.API.Application.Commands
     // https://msdn.microsoft.com/en-us/library/bb383979.aspx
 
     [DataContract]
-    public class ProcessOrderCommand
+    public class OrderProcessCommand
         : IAsyncRequest<bool>
     {
 
@@ -31,10 +31,10 @@ namespace Ordering.API.Application.Commands
         [DataMember]
         public IEnumerable<OrderItemDTO> OrderItems => _orderItems;
 
-        public ProcessOrderCommand(int orderId)
+        public OrderProcessCommand(int orderId, List<OrderItemDTO> orderItems)
         {
             OrderNumber = orderId;
-            _orderItems = new List<OrderItemDTO>();
+            _orderItems = orderItems ?? new List<OrderItemDTO>();
         }
 
         public class OrderItemDTO

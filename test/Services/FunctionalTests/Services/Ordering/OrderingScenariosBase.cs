@@ -31,6 +31,7 @@ namespace FunctionalTests.Services.Ordering
         public static class Post
         {
             public static string AddNewOrder = "api/v1/orders/new";
+            public static string AddProcessOrder = "api/v1/orders/process";
         }
     }
 }

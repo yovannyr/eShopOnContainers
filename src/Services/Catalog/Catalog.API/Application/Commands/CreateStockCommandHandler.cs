@@ -56,7 +56,7 @@ namespace Catalog.API.Application.Commands
             var isSuccess = result > 0;
 
             // Send Integration event to ordering api in order to update order saga status            
-            var evt = new StockCreatedIntegrationEvent(message.OrderNumber, isSuccess);
+            var evt = new StockCheckedIntegrationEvent(message.OrderNumber, isSuccess);
             await _catalogIntegrationEventService.SaveEventAndCatalogContextChangesAsync(evt);
             await _catalogIntegrationEventService.PublishThroughEventBusAsync(evt);
             return isSuccess;

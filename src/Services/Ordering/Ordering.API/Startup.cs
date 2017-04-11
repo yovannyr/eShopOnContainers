@@ -149,10 +149,10 @@
 
             // Subscribe ordering.api to event bus
             var orderPaidHandler = app.ApplicationServices.GetService<IIntegrationEventHandler<OrderPaidIntegrationEvent>>();
-            var orderStockCreatedHandler = app.ApplicationServices.GetService<IIntegrationEventHandler<StockCreatedIntegrationEvent>>();
+            var orderStockCreatedHandler = app.ApplicationServices.GetService<IIntegrationEventHandler<StockCheckedIntegrationEvent>>();
             var eventBus = app.ApplicationServices.GetRequiredService<IEventBus>();
             eventBus.Subscribe<OrderPaidIntegrationEvent>(orderPaidHandler);
-            eventBus.Subscribe<StockCreatedIntegrationEvent>(orderStockCreatedHandler);
+            eventBus.Subscribe<StockCheckedIntegrationEvent>(orderStockCreatedHandler);
 
             OrderingContextSeed.SeedAsync(app).Wait();
 

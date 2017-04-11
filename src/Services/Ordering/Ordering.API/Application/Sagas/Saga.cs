@@ -24,10 +24,9 @@ namespace Ordering.API.Application.Sagas
             return saga != null;
         }
 
-        protected async Task MarkAsCompletedAndSaveAsync(TEntity item, DbContext context)
+        protected void MarkAsCompleted(TEntity item)
         {
             item.Completed = true;
-            await SaveChangesAsync(context);
         }
 
         protected void MarkAsCancelled(TEntity item)

@@ -17,41 +17,17 @@ namespace Payment.API.Controllers
         public PaymentController(IEventBus eventBus)
         {
             _eventBus = eventBus;
-        }
-    
-        // GET api/payment
-        [HttpGet]
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
-
-        // GET api/payment/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
+        }        
 
         // POST api/payment/1
         [Route("{orderId}")]
         [HttpPost]
         public void Post(int orderId)
         {
+            // Fake Payment gateway
+            // Send integration event to indicate that the payment is successfully done
             var evt = new OrderPaidIntegrationEvent(orderId, true);
             _eventBus.Publish(evt);
-        }
-
-        // PUT api/payment/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
-        {
-        }
-
-        // DELETE api/payment/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
+        }        
     }
 }
