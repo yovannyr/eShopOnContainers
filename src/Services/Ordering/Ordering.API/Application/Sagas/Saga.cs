@@ -13,18 +13,18 @@ namespace Ordering.API.Application.Sagas
         {
         }
 
-        protected TEntity FindById(int id, DbContext context)
+        protected TEntity FindSagaById(int id, DbContext context)
         {
             return context.Set<TEntity>().Where(x => x.CorrelationId == id).SingleOrDefault();
         }
 
         protected bool ExistSaga(int sagaId, DbContext context)
         {
-            var saga = FindById(sagaId, context);
+            var saga = FindSagaById(sagaId, context);
             return saga != null;
         }
 
-        protected void MarkAsCompleted(TEntity item)
+        protected void MarkSagaAsCompleted(TEntity item)
         {
             item.Completed = true;
         }
@@ -34,12 +34,12 @@ namespace Ordering.API.Application.Sagas
             item.Cancelled = true;
         }
 
-        protected void AddSagaState(TEntity item, DbContext context)
+        protected void AddSaga(TEntity item, DbContext context)
         {
             context.Add(item);
         }
 
-        protected void UpdateSagaState(TEntity item, DbContext context)
+        protected void UpdateSaga(TEntity item, DbContext context)
         {
             context.Update(item);
         }

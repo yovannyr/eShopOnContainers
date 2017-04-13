@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace Ordering.API.Application.DomainEventHandlers.OrderCompleted
 {
     public class OrderCompletedEventHandler
-                   : IAsyncNotificationHandler<OrderCompletedEvent>
+                   : IAsyncNotificationHandler<OrderProcessCompletedEvent>
     {
         private readonly ILifetimeScope _lifetimeScope;
         private readonly ILoggerFactory _logger;
@@ -26,7 +26,7 @@ namespace Ordering.API.Application.DomainEventHandlers.OrderCompleted
         // Domain Logic comment:
         // When the order is correctly finished in process ordering saga, 
         // then it updates the state of the order to completed status
-        public async Task Handle(OrderCompletedEvent orderCompletedEvent)
+        public async Task Handle(OrderProcessCompletedEvent orderCompletedEvent)
         {
             // A new lifetimescope must be created for OrderingContext since it is 
             // disposed when event is received

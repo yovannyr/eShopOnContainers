@@ -16,9 +16,9 @@ using System.Threading.Tasks;
 
 namespace Ordering.API.Application.Sagas
 {
-    public class ProcessOrderCommandIdentifiedHandler : IdentifierCommandHandler<OrderProcessCommand, bool>
+    public class OrderProcessCommandIdentifiedHandler : IdentifierCommandHandler<CreateOrderProcessCommand, bool>
     {
-        public ProcessOrderCommandIdentifiedHandler(IMediator mediator, IRequestManager requestManager) : base(mediator, requestManager)
+        public OrderProcessCommandIdentifiedHandler(IMediator mediator, IRequestManager requestManager) : base(mediator, requestManager)
         {
         }
 
@@ -29,18 +29,20 @@ namespace Ordering.API.Application.Sagas
     }
 
     /// <summary>
-    /// Saga for enforcing payment and stock
-    /// execution before shipping order
+    /// Saga for enforcing payment and stock checking
+    /// If both are successfully executed, the saga is 
+    /// marked as completed and the order's state is 
+    /// updated accordingly
     /// </summary>
     public class OrderProcessSaga : Saga<OrderSagaData>,
-        IAsyncRequestHandler<OrderProcessCommand, bool>,
+        IAsyncRequestHandler<CreateOrderProcessCommand, bool>,
         IIntegrationEventHandler<OrderPaidIntegrationEvent>,
         IIntegrationEventHandler<StockCheckedIntegrationEvent>
     {
         private readonly IHttpClient _apiClient;
         private readonly IOptionsSnapshot<Settings> _settings;
         private readonly IMediator _mediator;
-        private Func<Owned<OrderingContext>> _dbContextFactory;
+        private readonly Func<Owned<OrderingContext>> _dbContextFactory;
 
         public OrderProcessSaga(
             IHttpClient httpClient, IOptionsSnapshot<Settings> settings,
@@ -54,22 +56,23 @@ namespace Ordering.API.Application.Sagas
         }
 
         /// <summary>
-        /// Handler for processing ProcessOrder command
-        /// Entry point of the ordering saga
+        /// Entry point of the order process saga
+        /// Handler which processes the command when
+        /// user executes process order
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<bool> Handle(OrderProcessCommand command)
+        public async Task<bool> Handle(CreateOrderProcessCommand command)
         {
             bool result = true;
             using (var ctx = _dbContextFactory().Value)
             {
                 if (!ExistSaga(command.OrderNumber, ctx))
                 {
-                    AddSagaState(new OrderSagaData()
+                    AddSaga(new OrderSagaData()
                     {
                         CorrelationId = command.OrderNumber,
-                        Originator = nameof(OrderProcessCommand)
+                        Originator = nameof(CreateOrderProcessCommand)
                     }, 
                     ctx);
 
@@ -92,28 +95,30 @@ namespace Ordering.API.Application.Sagas
 
         /// <summary>
         /// Integration event handler which processes 
-        /// the bus event when the payment is done
+        /// the event sent by payment gateway api when
+        /// when a payment is executed for an order
         /// </summary>
         /// <param name="event"></param>
         /// <returns></returns>
         public async Task Handle(OrderPaidIntegrationEvent @event)
         {
-            // A new lifetimescope must be created for OrderingContext since it is 
+            // Managing an owned lifetimescope for OrderingContext since it is 
             // disposed when event is received
             using (var ctx = _dbContextFactory().Value)
             {
-                var orderSaga = FindById(@event.OrderId, ctx);
+                var orderSaga = FindSagaById(@event.OrderId, ctx);
                 CheckValidSagaId(orderSaga);
                 orderSaga.IsPaymentDone = @event.IsSuccess;
-                UpdateSagaState(orderSaga, ctx);                
+                UpdateSaga(orderSaga, ctx);                
                 await CheckForSagaCompletionAsync(orderSaga, ctx);
                 await SaveChangesAsync(ctx);
             }
         }
 
         /// <summary>
-        /// Integration event handler which processes the bus
-        /// event received when the inventory stock is checked
+        /// Integration event handler which processes
+        /// the event sent by catalog api when a new 
+        /// stock checking is executed for an order
         /// </summary>
         /// <param name="event"></param>
         /// <returns></returns>
@@ -121,10 +126,10 @@ namespace Ordering.API.Application.Sagas
         {
             using (var ctx = _dbContextFactory().Value)
             {
-                var orderSaga = FindById(@event.OrderId, ctx);
+                var orderSaga = FindSagaById(@event.OrderId, ctx);
                 CheckValidSagaId(orderSaga);
                 orderSaga.IsStockProvided = @event.IsSuccess;
-                UpdateSagaState(orderSaga, ctx);                
+                UpdateSaga(orderSaga, ctx);                
                 await CheckForSagaCompletionAsync(orderSaga, ctx);
                 await SaveChangesAsync(ctx);
             }
@@ -135,11 +140,11 @@ namespace Ordering.API.Application.Sagas
             if(saga.IsPaymentDone && saga.IsStockProvided)
             {
                 // Set saga as completed
-                MarkAsCompleted(saga);
-                UpdateSagaState(saga, ctx);
+                MarkSagaAsCompleted(saga);
+                UpdateSaga(saga, ctx);
 
-                // Send domain event to update order's state to complete and save                
-                var orderCompletedEvt = new OrderCompletedEvent(saga.CorrelationId);
+                // Send domain event to update order's state            
+                var orderCompletedEvt = new OrderProcessCompletedEvent(saga.CorrelationId);
                 await _mediator.PublishAsync(orderCompletedEvt);
             }            
         }
@@ -148,7 +153,7 @@ namespace Ordering.API.Application.Sagas
         {
             if (orderSaga is null)
             {
-                throw new OrderingDomainException("Not able to process Stock Requested event.Reason: no valid orderId");
+                throw new OrderingDomainException("Not able to process order process saga event.Reason: no valid orderId");
             }
         }
     }

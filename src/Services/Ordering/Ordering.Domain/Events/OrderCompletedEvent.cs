@@ -5,12 +5,12 @@ using System.Text;
 
 namespace Ordering.Domain.Events
 {
-    public class OrderCompletedEvent
+    public class OrderProcessCompletedEvent
         : IAsyncNotification
     {        
         public int OrderId { get; private set; }
 
-        public OrderCompletedEvent(int orderId)
+        public OrderProcessCompletedEvent(int orderId)
         {
             OrderId = orderId;            
         }
