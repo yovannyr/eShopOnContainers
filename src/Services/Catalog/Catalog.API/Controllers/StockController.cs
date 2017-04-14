@@ -30,14 +30,15 @@ namespace Catalog.API.Controllers
             ((DbContext)Context).ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
         }
 
-        //POST api/v1/[controller]/
+        //PUT api/v1/[controller]/stocktoremovefromproducts
+        [Route("stocktoremovefromproducts")]
         [HttpPost]
-        public async Task<IActionResult> CreateStock([FromBody]CreateStockCommand command, [FromHeader(Name = "x-requestid")] string requestId)
+        public async Task<IActionResult> RemoveStockFromProducs([FromBody]RemoveStockFromProducsCommand command, [FromHeader(Name = "x-requestid")] string requestId)
         {
             bool result = false;
             if (Guid.TryParse(requestId, out Guid guid) && guid != Guid.Empty)
             {
-                var requestCreateStock = new IdentifiedCommand<CreateStockCommand, bool>(command, guid);
+                var requestCreateStock = new IdentifiedCommand<RemoveStockFromProducsCommand, bool>(command, guid);
                 result = await _mediator.SendAsync(requestCreateStock);
             }            
 
@@ -49,10 +50,10 @@ namespace Catalog.API.Controllers
             return BadRequest();
         }
 
-        //PUT api/v1/[controller]/product/1/quantity/3
-        [Route("product/{productId}/quantity/{quantity}")]
+        //PUT api/v1/[controller]/products/1/stocktoadd/3
+        [Route("products/{productId}/stocktoadd/{quantity}")]
         [HttpPut]
-        public async Task<IActionResult> UpdateStock(int productId, int quantity)
+        public async Task<IActionResult> AddStockToProduct(int productId, int quantity)
         {
             var productToUpdate = _catalogContext.CatalogItems
                 .Where(x => x.Id == productId).SingleOrDefault();

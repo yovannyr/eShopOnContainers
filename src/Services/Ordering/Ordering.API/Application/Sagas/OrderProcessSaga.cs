@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Ordering.API.Application.Sagas
 {
-    public class OrderProcessCommandIdentifiedHandler : IdentifierCommandHandler<CreateOrderProcessCommand, bool>
+    public class OrderProcessCommandIdentifiedHandler : IdentifierCommandHandler<StartOrderProcessCommand, bool>
     {
         public OrderProcessCommandIdentifiedHandler(IMediator mediator, IRequestManager requestManager) : base(mediator, requestManager)
         {
@@ -35,7 +35,7 @@ namespace Ordering.API.Application.Sagas
     /// updated accordingly
     /// </summary>
     public class OrderProcessSaga : Saga<OrderSagaData>,
-        IAsyncRequestHandler<CreateOrderProcessCommand, bool>,
+        IAsyncRequestHandler<StartOrderProcessCommand, bool>,
         IIntegrationEventHandler<OrderPaidIntegrationEvent>,
         IIntegrationEventHandler<StockCheckedIntegrationEvent>
     {
@@ -62,7 +62,7 @@ namespace Ordering.API.Application.Sagas
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<bool> Handle(CreateOrderProcessCommand command)
+        public async Task<bool> Handle(StartOrderProcessCommand command)
         {
             bool result = true;
             using (var ctx = _dbContextFactory().Value)
@@ -72,7 +72,7 @@ namespace Ordering.API.Application.Sagas
                     AddSaga(new OrderSagaData()
                     {
                         CorrelationId = command.OrderNumber,
-                        Originator = nameof(CreateOrderProcessCommand)
+                        Originator = nameof(StartOrderProcessCommand)
                     }, 
                     ctx);
 
@@ -80,15 +80,18 @@ namespace Ordering.API.Application.Sagas
                 }
             }
 
-            // Call catalog api to create a stock inventory
+            // Call catalog api to check inventory stock 
             _apiClient.Inst.DefaultRequestHeaders.Add("x-requestid", Guid.NewGuid().ToString());
-            var catalogResponse = await _apiClient.PostAsync($"{_settings.Value.CatalogUrl}/api/v1/stock", command);
+            var catalogResponse = await _apiClient.PostAsync($"{_settings.Value.CatalogUrl}/api/v1/stock/stocktoremovefromproducts", command);
             result &= catalogResponse.IsSuccessStatusCode;
 
             // Call payment gateway api to create the payment
             _apiClient.Inst.DefaultRequestHeaders.Add("x-requestid", Guid.NewGuid().ToString());
             var paymentResponse = await _apiClient.PostAsync($"{_settings.Value.PaymentUrl}/api/v1/payment/{command.OrderNumber}", command);
             result &= paymentResponse.IsSuccessStatusCode;
+
+            // Call catalog api to RemoveStock from items in the order
+            // TO DO
 
             return result;
         }

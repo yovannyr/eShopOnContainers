@@ -19,7 +19,7 @@ namespace Catalog.API.Infrastructure.AutofacModules
                 .AsImplementedInterfaces();
 
             // Register all the Command classes (they implement IAsyncRequestHandler) in assembly holding the Commands
-            builder.RegisterAssemblyTypes(typeof(CreateStockCommand).GetTypeInfo().Assembly)
+            builder.RegisterAssemblyTypes(typeof(RemoveStockFromProducsCommand).GetTypeInfo().Assembly)
                 .As(o => o.GetInterfaces()
                     .Where(i => i.IsClosedTypeOf(typeof(IAsyncRequestHandler<,>)))
                     .Select(i => new KeyedService("IAsyncRequestHandler", i))).AsImplementedInterfaces();            

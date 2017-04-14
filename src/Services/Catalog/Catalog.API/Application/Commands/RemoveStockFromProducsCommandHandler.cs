@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace Catalog.API.Application.Commands
 {
-    public class CreateStockCommandIdentifiedHandler : IdentifierCommandHandler<CreateStockCommand, bool>
+    public class RemoveStockFromProducsIdentifiedHandler : IdentifierCommandHandler<RemoveStockFromProducsCommand, bool>
     {
-        public CreateStockCommandIdentifiedHandler(IMediator mediator, IRequestManager requestManager) : base(mediator, requestManager)
+        public RemoveStockFromProducsIdentifiedHandler(IMediator mediator, IRequestManager requestManager) : base(mediator, requestManager)
         {
         }
 
@@ -21,12 +21,12 @@ namespace Catalog.API.Application.Commands
         }
     }
 
-    public class CreateStockCommandHandler
-        : IAsyncRequestHandler<CreateStockCommand, bool>
+    public class RemoveStockFromProducsCommandHandler
+        : IAsyncRequestHandler<RemoveStockFromProducsCommand, bool>
     {
         private readonly ICatalogIntegrationEventService _catalogIntegrationEventService;
         private readonly CatalogContext _catalogContext;
-        public CreateStockCommandHandler(
+        public RemoveStockFromProducsCommandHandler(
             ICatalogIntegrationEventService catalogIntegrationEventService,
             CatalogContext catalogContext)
         {
@@ -34,7 +34,7 @@ namespace Catalog.API.Application.Commands
             _catalogContext = catalogContext;
         }
 
-        public async Task<bool> Handle(CreateStockCommand message)
+        public async Task<bool> Handle(RemoveStockFromProducsCommand message)
         {
             var ids = message.OrderItems.Select(i => i.ProductId);
             var productsToUpdate = _catalogContext.CatalogItems

@@ -14,7 +14,7 @@ namespace Catalog.API.Application.Commands
     // https://msdn.microsoft.com/en-us/library/bb383979.aspx
 
     [DataContract]
-    public class CreateStockCommand
+    public class RemoveStockFromProducsCommand
         : IAsyncRequest<bool>
     {
         [DataMember]
@@ -31,7 +31,7 @@ namespace Catalog.API.Application.Commands
             _orderItems.Add(item);
         }
 
-        public CreateStockCommand(int orderId)
+        public RemoveStockFromProducsCommand(int orderId)
         {
             OrderNumber = orderId;
             _orderItems = new List<OrderItemDTO>();

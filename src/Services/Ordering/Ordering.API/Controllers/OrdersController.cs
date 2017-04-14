@@ -54,13 +54,13 @@ namespace Microsoft.eShopOnContainers.Services.Ordering.API.Controllers
 
         [Route("process")]
         [HttpPost]
-        public async Task<IActionResult> ProcessOrder([FromBody]CreateOrderProcessCommand command, [FromHeader(Name = "x-requestid")] string requestId)
+        public async Task<IActionResult> StartOrderProcess([FromBody]StartOrderProcessCommand command, [FromHeader(Name = "x-requestid")] string requestId)
         {
             bool result = false;
 
             if (Guid.TryParse(requestId, out Guid guid) && guid != Guid.Empty)
             {
-                var requestProcessOrder = new IdentifiedCommand<CreateOrderProcessCommand, bool>(command, guid);
+                var requestProcessOrder = new IdentifiedCommand<StartOrderProcessCommand, bool>(command, guid);
                 result = await _mediator.SendAsync(requestProcessOrder);
             }            
 

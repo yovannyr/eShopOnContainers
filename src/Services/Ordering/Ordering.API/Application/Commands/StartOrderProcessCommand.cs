@@ -18,7 +18,7 @@ namespace Ordering.API.Application.Commands
     // https://msdn.microsoft.com/en-us/library/bb383979.aspx
 
     [DataContract]
-    public class CreateOrderProcessCommand
+    public class StartOrderProcessCommand
         : IAsyncRequest<bool>
     {
 
@@ -31,7 +31,7 @@ namespace Ordering.API.Application.Commands
         [DataMember]
         public IEnumerable<OrderItemDTO> OrderItems => _orderItems;
 
-        public CreateOrderProcessCommand(int orderId, List<OrderItemDTO> orderItems)
+        public StartOrderProcessCommand(int orderId, List<OrderItemDTO> orderItems)
         {
             OrderNumber = orderId;
             _orderItems = orderItems ?? new List<OrderItemDTO>();

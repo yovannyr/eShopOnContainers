@@ -4,11 +4,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using static Ordering.API.Application.Commands.CreateOrderProcessCommand;
+using static Ordering.API.Application.Commands.StartOrderProcessCommand;
 
 namespace Ordering.API.Application.Validations
 {
-    public class CreateOrderProcessCommandValidator : AbstractValidator<CreateOrderProcessCommand>
+    public class CreateOrderProcessCommandValidator : AbstractValidator<StartOrderProcessCommand>
     {
         public CreateOrderProcessCommandValidator()
         {

@@ -119,15 +119,15 @@ namespace FunctionalTests.Services.Ordering
 
         string BuildProcessOrder(string orderId)
         {
-            var orderItems = new List<CreateOrderProcessCommand.OrderItemDTO>() {
-                new CreateOrderProcessCommand.OrderItemDTO()
+            var orderItems = new List<StartOrderProcessCommand.OrderItemDTO>() {
+                new StartOrderProcessCommand.OrderItemDTO()
                 {
                     ProductId = 1,
                     Units = 2,
                 }
             };
 
-            var order = new CreateOrderProcessCommand(
+            var order = new StartOrderProcessCommand(
                 int.Parse(orderId),
                 orderItems
             );            
