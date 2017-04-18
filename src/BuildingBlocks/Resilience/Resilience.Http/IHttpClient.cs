@@ -11,6 +11,7 @@ namespace Microsoft.eShopOnContainers.BuildingBlocks.Resilience.Http
         HttpClient Inst { get; }
         Task<string> GetStringAsync(string uri);
         Task<HttpResponseMessage> PostAsync<T>(string uri, T item);
+        Task<HttpResponseMessage> PutAsync<T>(string uri, T item);
         Task<HttpResponseMessage> DeleteAsync(string uri);
     }
 }

@@ -51,6 +51,22 @@ namespace Microsoft.eShopOnContainers.BuildingBlocks.Resilience.Http
                 return response;
             });
 
+        public Task<HttpResponseMessage> PutAsync<T>(string uri, T item) =>
+            // a new StringContent must be created for each retry 
+            // as it is disposed after each call
+            HttpInvoker(() =>
+            {
+                var response = _client.PutAsync(uri, new StringContent(JsonConvert.SerializeObject(item), System.Text.Encoding.UTF8, "application/json"));
+                // raise exception if HttpResponseCode 500 
+                // needed for circuit breaker to track fails
+                if (response.Result.StatusCode == HttpStatusCode.InternalServerError)
+                {
+                    throw new HttpRequestException();
+                }
+
+                return response;
+            });
+
         public Task<HttpResponseMessage> DeleteAsync(string uri) =>
             HttpInvoker(() => _client.DeleteAsync(uri));
 

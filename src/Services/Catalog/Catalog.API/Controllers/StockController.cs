@@ -32,7 +32,7 @@ namespace Catalog.API.Controllers
 
         //PUT api/v1/[controller]/stocktoremovefromproducts
         [Route("stocktoremovefromproducts")]
-        [HttpPost]
+        [HttpPut]
         public async Task<IActionResult> RemoveStockFromProducs([FromBody]RemoveStockFromProducsCommand command, [FromHeader(Name = "x-requestid")] string requestId)
         {
             bool result = false;

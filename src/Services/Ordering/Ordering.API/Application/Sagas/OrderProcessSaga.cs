@@ -82,10 +82,10 @@ namespace Ordering.API.Application.Sagas
 
             // Call catalog api to check inventory stock 
             _apiClient.Inst.DefaultRequestHeaders.Add("x-requestid", Guid.NewGuid().ToString());
-            var catalogResponse = await _apiClient.PostAsync($"{_settings.Value.CatalogUrl}/api/v1/stock/stocktoremovefromproducts", command);
+            var catalogResponse = await _apiClient.PutAsync($"{_settings.Value.CatalogUrl}/api/v1/stock/stocktoremovefromproducts", command);
             result &= catalogResponse.IsSuccessStatusCode;
 
-            // Call payment gateway api to create the payment
+            // Call payment api to record the new payment
             _apiClient.Inst.DefaultRequestHeaders.Add("x-requestid", Guid.NewGuid().ToString());
             var paymentResponse = await _apiClient.PostAsync($"{_settings.Value.PaymentUrl}/api/v1/payment/{command.OrderNumber}", command);
             result &= paymentResponse.IsSuccessStatusCode;

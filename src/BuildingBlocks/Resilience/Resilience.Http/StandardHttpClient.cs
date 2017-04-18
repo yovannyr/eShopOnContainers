@@ -26,6 +26,12 @@ namespace Microsoft.eShopOnContainers.BuildingBlocks.Resilience.Http
             return _client.PostAsync(uri, contentString);
         }
 
+        public Task<HttpResponseMessage> PutAsync<T>(string uri, T item)
+        {
+            var contentString = new StringContent(JsonConvert.SerializeObject(item), System.Text.Encoding.UTF8, "application/json");
+            return _client.PutAsync(uri, contentString);
+        }
+
         public Task<HttpResponseMessage> DeleteAsync(string uri) =>
             _client.DeleteAsync(uri);
     }
