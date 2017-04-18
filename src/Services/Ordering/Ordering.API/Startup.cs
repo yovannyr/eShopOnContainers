@@ -4,9 +4,9 @@
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using global::Ordering.API;
+    using global::Ordering.API.Application.IntegrationEvents;
+    using global::Ordering.API.Application.IntegrationEvents.Events;
     using global::Ordering.API.Infrastructure.Middlewares;
-    using global::Ordering.API.IntegrationEvents;
-    using global::Ordering.API.IntegrationEvents.Events;
     using Infrastructure;
     using Infrastructure.Auth;
     using Infrastructure.AutofacModules;

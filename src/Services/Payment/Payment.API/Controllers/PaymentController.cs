@@ -24,8 +24,8 @@ namespace Payment.API.Controllers
         [HttpPost]
         public void Post(int orderId)
         {
-            // Fake Payment gateway
-            // Send integration event to indicate that the payment is successfully done
+            // Fake Payment records
+            // Send integration event to indicate that the payment is successfully registered
             var evt = new OrderPaidIntegrationEvent(orderId, true);
             _eventBus.Publish(evt);
         }        

@@ -7,7 +7,7 @@ using Microsoft.eShopOnContainers.Services.Ordering.Infrastructure;
 using Microsoft.eShopOnContainers.Services.Ordering.Infrastructure.Idempotency;
 using Microsoft.Extensions.Options;
 using Ordering.API.Application.Commands;
-using Ordering.API.IntegrationEvents.Events;
+using Ordering.API.Application.IntegrationEvents.Events;
 using Ordering.Domain.Events;
 using Ordering.Domain.Exceptions;
 using Ordering.Domain.SagaData;
