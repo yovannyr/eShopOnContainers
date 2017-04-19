@@ -23,15 +23,55 @@ namespace WebMVC.Controllers
         public async Task<IActionResult> Index()
         {
             var user = _appUserParser.Parse(HttpContext.User);
-            var vm = await _orderSvc.GetMyOrders(user);
+            var vm = await _orderSvc.GetMyOrders(user); 
             return View(vm);
         }
 
-        public async Task<IActionResult> Process(string orderId)
+        public async Task<IActionResult> CheckStock(string orderId)
         {
             var user = _appUserParser.Parse(HttpContext.User);
             var order = await _orderSvc.GetOrder(user, orderId);
-            await _orderSvc.CreateProcessOrder(order, Guid.NewGuid().ToString());
+            await _orderSvc.CheckStockOrderProcess(order, Guid.NewGuid().ToString());
+            return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> RecordPayment(string orderId)
+        {
+            var user = _appUserParser.Parse(HttpContext.User);
+            var order = await _orderSvc.GetOrder(user, orderId);
+            await _orderSvc.RecordPaymentOrderProcess(order, Guid.NewGuid().ToString());
+            return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> Ship(string orderId)
+        {
+            var user = _appUserParser.Parse(HttpContext.User);
+            var order = await _orderSvc.GetOrder(user, orderId);
+            await _orderSvc.ShipOrderProcess(order, Guid.NewGuid().ToString());
+            return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> Refund(string orderId)
+        {
+            var user = _appUserParser.Parse(HttpContext.User);
+            var order = await _orderSvc.GetOrder(user, orderId);
+            await _orderSvc.RefundOrderProcess(order, Guid.NewGuid().ToString());
+            return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> Cancel(string orderId)
+        {
+            var user = _appUserParser.Parse(HttpContext.User);
+            var order = await _orderSvc.GetOrder(user, orderId);
+            await _orderSvc.CancelOrderProcess(order, Guid.NewGuid().ToString());
+            return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> Complete(string orderId)
+        {
+            var user = _appUserParser.Parse(HttpContext.User);
+            var order = await _orderSvc.GetOrder(user, orderId);
+            await _orderSvc.CompletedOrderProcess(order, Guid.NewGuid().ToString());
             return RedirectToAction("Index");
         }
     }

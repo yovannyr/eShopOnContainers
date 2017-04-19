@@ -27,10 +27,12 @@
                     <section class="esh-orders-item col-xs-2">$ @Html.DisplayFor(modelItem => item.Total)</section>
                     <section class="esh-orders-item col-xs-2">@Html.DisplayFor(modelItem => item.Status)</section>
                     <section class="esh-orders-item col-xs-2">
-                        @if((!item.IsCompleted.HasValue) || (!item.IsCompleted.Value))
-                        {
-                            <a class="btn esh-orders_process-placeOrder" asp-controller="OrderManagement" asp-action="Process" asp-route-orderId="@item.OrderNumber">[ Process ]</a>
-                        }                        
+                        <a class="btn esh-orders_process-placeOrder" asp-controller="OrderManagement" asp-action="CheckStock" asp-route-orderId="@item.OrderNumber">[ CheckStock ]</a> 
+                        <a class="btn esh-orders_process-placeOrder" asp-controller="OrderManagement" asp-action="RecordPayment" asp-route-orderId="@item.OrderNumber">[ RecordPayment ]</a> 
+                        <a class="btn esh-orders_process-placeOrder" asp-controller="OrderManagement" asp-action="Ship" asp-route-orderId="@item.OrderNumber">[ Ship ]</a> 
+                        <a class="btn esh-orders_process-placeOrder" asp-controller="OrderManagement" asp-action="Refund" asp-route-orderId="@item.OrderNumber">[ Refund ]</a> 
+                        <a class="btn esh-orders_process-placeOrder" asp-controller="OrderManagement" asp-action="Cancel" asp-route-orderId="@item.OrderNumber">[ Cancel ]</a>
+                        <a class="btn esh-orders_process-placeOrder" asp-controller="OrderManagement" asp-action="Complete" asp-route-orderId="@item.OrderNumber">[ Complete ]</a>
                     </section>                    
                 </article>
             }

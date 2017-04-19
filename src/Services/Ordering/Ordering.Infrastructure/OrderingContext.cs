@@ -32,8 +32,6 @@ namespace Microsoft.eShopOnContainers.Services.Ordering.Infrastructure
 
         public DbSet<OrderStatus> OrderStatus { get; set; }
 
-        public DbSet<OrderSagaData> OrderSagaData { get; set; }
-
         private readonly IMediator _mediator;
 
         public OrderingContext(DbContextOptions options, IMediator mediator) : base(options)
@@ -52,7 +50,6 @@ namespace Microsoft.eShopOnContainers.Services.Ordering.Infrastructure
             modelBuilder.Entity<CardType>(ConfigureCardTypes);
             modelBuilder.Entity<OrderStatus>(ConfigureOrderStatus);
             modelBuilder.Entity<Buyer>(ConfigureBuyer);
-            modelBuilder.Entity<OrderSagaData>(ConfigureOrderSagaData);
         }
 
         private void ConfigureRequests(EntityTypeBuilder<ClientRequest> requestConfiguration)
@@ -241,16 +238,6 @@ namespace Microsoft.eShopOnContainers.Services.Ordering.Infrastructure
 
             cardTypesConfiguration.Property(ct => ct.Name)
                 .HasMaxLength(200)
-                .IsRequired();
-        }
-
-        void ConfigureOrderSagaData(EntityTypeBuilder<OrderSagaData> orderSagaDataConfiguration)
-        {
-            orderSagaDataConfiguration.ToTable("OrderSaga");
-
-            orderSagaDataConfiguration.HasKey(e => e.Id);
-
-            orderSagaDataConfiguration.Property(e => e.CorrelationId)
                 .IsRequired();
         }
 

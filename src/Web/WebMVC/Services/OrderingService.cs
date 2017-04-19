@@ -92,7 +92,7 @@ namespace Microsoft.eShopOnContainers.WebMVC.Services
             response.EnsureSuccessStatusCode();
         }
 
-        async public Task CreateProcessOrder(Order order, string requestId)
+        async public Task CheckStockOrderProcess(Order order, string requestId)
         {
             var context = _httpContextAccesor.HttpContext;
             var token = await context.Authentication.GetTokenAsync("access_token");
@@ -100,13 +100,103 @@ namespace Microsoft.eShopOnContainers.WebMVC.Services
             _apiClient.Inst.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             _apiClient.Inst.DefaultRequestHeaders.Add("x-requestid", requestId);
 
-            var ordersUrl = $"{_remoteServiceBaseUrl}/process";
+            var ordersUrl = $"{_remoteServiceBaseUrl}/checkStock";
             SetFakeIdToProducts(order);
 
-            var response = await _apiClient.PostAsync(ordersUrl, order);
+            var response = await _apiClient.PutAsync(ordersUrl, order);
 
             if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
-                throw new Exception("Error creating order, try later");
+                throw new Exception("Error processing order, try later");
+
+            response.EnsureSuccessStatusCode();
+        }
+
+        async public Task RecordPaymentOrderProcess(Order order, string requestId)
+        {
+            var context = _httpContextAccesor.HttpContext;
+            var token = await context.Authentication.GetTokenAsync("access_token");
+
+            _apiClient.Inst.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            _apiClient.Inst.DefaultRequestHeaders.Add("x-requestid", requestId);
+
+            var ordersUrl = $"{_remoteServiceBaseUrl}/recordPayment";
+
+            var response = await _apiClient.PutAsync(ordersUrl, order);
+
+            if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
+                throw new Exception("Error processing order, try later");
+
+            response.EnsureSuccessStatusCode();
+        }
+
+        async public Task ShipOrderProcess(Order order, string requestId)
+        {
+            var context = _httpContextAccesor.HttpContext;
+            var token = await context.Authentication.GetTokenAsync("access_token");
+
+            _apiClient.Inst.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            _apiClient.Inst.DefaultRequestHeaders.Add("x-requestid", requestId);
+
+            var ordersUrl = $"{_remoteServiceBaseUrl}/ship";
+
+            var response = await _apiClient.PutAsync(ordersUrl, order);
+
+            if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
+                throw new Exception("Error processing order, try later");
+
+            response.EnsureSuccessStatusCode();
+        }
+
+        async public Task RefundOrderProcess(Order order, string requestId)
+        {
+            var context = _httpContextAccesor.HttpContext;
+            var token = await context.Authentication.GetTokenAsync("access_token");
+
+            _apiClient.Inst.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            _apiClient.Inst.DefaultRequestHeaders.Add("x-requestid", requestId);
+
+            var ordersUrl = $"{_remoteServiceBaseUrl}/refund";
+
+            var response = await _apiClient.PutAsync(ordersUrl, order);
+
+            if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
+                throw new Exception("Error processing order, try later");
+
+            response.EnsureSuccessStatusCode();
+        }
+
+        async public Task CancelOrderProcess(Order order, string requestId)
+        {
+            var context = _httpContextAccesor.HttpContext;
+            var token = await context.Authentication.GetTokenAsync("access_token");
+
+            _apiClient.Inst.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            _apiClient.Inst.DefaultRequestHeaders.Add("x-requestid", requestId);
+
+            var ordersUrl = $"{_remoteServiceBaseUrl}/cancel";
+
+            var response = await _apiClient.PutAsync(ordersUrl, order);
+
+            if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
+                throw new Exception("Error processing order, try later");
+
+            response.EnsureSuccessStatusCode();
+        }
+
+        async public Task CompletedOrderProcess(Order order, string requestId)
+        {
+            var context = _httpContextAccesor.HttpContext;
+            var token = await context.Authentication.GetTokenAsync("access_token");
+
+            _apiClient.Inst.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            _apiClient.Inst.DefaultRequestHeaders.Add("x-requestid", requestId);
+
+            var ordersUrl = $"{_remoteServiceBaseUrl}/complete";
+
+            var response = await _apiClient.PutAsync(ordersUrl, order);
+
+            if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
+                throw new Exception("Error processing order, try later");
 
             response.EnsureSuccessStatusCode();
         }

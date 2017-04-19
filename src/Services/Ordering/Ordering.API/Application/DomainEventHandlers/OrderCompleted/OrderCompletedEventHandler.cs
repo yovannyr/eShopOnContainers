@@ -13,34 +13,21 @@ namespace Ordering.API.Application.DomainEventHandlers.OrderCompleted
     public class OrderCompletedEventHandler
                    : IAsyncNotificationHandler<OrderProcessCompletedEvent>
     {
-        private readonly ILifetimeScope _lifetimeScope;
         private readonly ILoggerFactory _logger;
 
-        public OrderCompletedEventHandler(
-            ILifetimeScope lifetimeScope, ILoggerFactory logger)
-        {
-            _lifetimeScope = lifetimeScope ?? throw new ArgumentNullException(nameof(lifetimeScope));            
+        public OrderCompletedEventHandler(ILoggerFactory logger)
+        {           
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        // Domain Logic comment:
-        // When the order is correctly finished in process ordering saga, 
-        // then it updates the state of the order to completed status
         public async Task Handle(OrderProcessCompletedEvent orderCompletedEvent)
         {
-            // A new lifetimescope must be created for OrderingContext since it is 
-            // disposed when event is received
-            using (var scope = _lifetimeScope.BeginLifetimeScope())
-            {
-                var orderRepository = scope.Resolve<IOrderRepository>();
-                var orderToUpdate = await orderRepository.GetAsync(orderCompletedEvent.OrderId);
-                orderToUpdate.SetOrderStatusId(OrderStatus.Shipped.Id);
-                orderRepository.Update(orderToUpdate);
-                await orderRepository.UnitOfWork.SaveChangesAsync();
-            }                
+            // TODO: Notify user that the order has been completed and shipped
 
             _logger.CreateLogger(nameof(OrderCompletedEventHandler))
-                .LogTrace($"Thre process Order with Id: {orderCompletedEvent.OrderId} has been successfully completed and is ready to ship");
+                .LogTrace($"Thre process Order with Id: {orderCompletedEvent.OrderId} has been successfully completed and shipped");
+
+            await Task.FromResult(1);
         }
     }
 }

@@ -21,6 +21,8 @@ namespace Microsoft.eShopOnContainers.Services.Ordering.Domain.AggregatesModel.O
         private int? _buyerId;
 
         public OrderStatus OrderStatus { get; private set; }
+
+        public int OrderStatusId => _orderStatusId;
         private int _orderStatusId;
 
 
@@ -49,7 +51,7 @@ namespace Microsoft.eShopOnContainers.Services.Ordering.Domain.AggregatesModel.O
             _orderItems = new List<OrderItem>();
             _buyerId = buyerId;
             _paymentMethodId = paymentMethodId;
-            _orderStatusId = OrderStatus.InProcess.Id;
+            _orderStatusId = OrderStatus.Pending.Id;
             _orderDate = DateTime.UtcNow;
             Address = address;
 

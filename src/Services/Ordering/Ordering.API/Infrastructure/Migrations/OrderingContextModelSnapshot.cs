@@ -43,6 +43,7 @@ namespace Ordering.API.Migrations
             modelBuilder.Entity("Microsoft.eShopOnContainers.Services.Ordering.Domain.AggregatesModel.BuyerAggregate.CardType", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasDefaultValue(1);
 
                     b.Property<string>("Name")
@@ -172,6 +173,7 @@ namespace Ordering.API.Migrations
             modelBuilder.Entity("Microsoft.eShopOnContainers.Services.Ordering.Domain.AggregatesModel.OrderAggregate.OrderStatus", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasDefaultValue(1);
 
                     b.Property<string>("Name")
@@ -196,28 +198,6 @@ namespace Ordering.API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("requests","ordering");
-                });
-
-            modelBuilder.Entity("Ordering.Domain.SagaData.OrderSagaData", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<bool>("Cancelled");
-
-                    b.Property<bool>("Completed");
-
-                    b.Property<int>("CorrelationId");
-
-                    b.Property<bool>("IsPaymentDone");
-
-                    b.Property<bool>("IsStockProvided");
-
-                    b.Property<string>("Originator");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("OrderSaga");
                 });
 
             modelBuilder.Entity("Microsoft.eShopOnContainers.Services.Ordering.Domain.AggregatesModel.BuyerAggregate.PaymentMethod", b =>

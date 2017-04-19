@@ -45,7 +45,7 @@ namespace Ordering.API.Application.DomainEventHandlers.OrderStartedEvent
                                            orderStartedEvent.Order.Id);
 
             var buyerUpdated = buyerOriginallyExisted ? _buyerRepository.Update(buyer) : _buyerRepository.Add(buyer);
-
+            
             await _buyerRepository.UnitOfWork
                 .SaveEntitiesAsync();
 

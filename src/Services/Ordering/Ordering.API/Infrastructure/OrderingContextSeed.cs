@@ -31,9 +31,15 @@
 
                 if (!context.OrderStatus.Any())
                 {
-                    context.OrderStatus.Add(OrderStatus.Canceled);
-                    context.OrderStatus.Add(OrderStatus.InProcess);
+                    context.OrderStatus.Add(OrderStatus.Pending);
+                    context.OrderStatus.Add(OrderStatus.AwaitingCheckStock);
+                    context.OrderStatus.Add(OrderStatus.AwaitingPayment);
+                    context.OrderStatus.Add(OrderStatus.AwaitingRecordPayment);
+                    context.OrderStatus.Add(OrderStatus.AwaitingShipment);
                     context.OrderStatus.Add(OrderStatus.Shipped);
+                    context.OrderStatus.Add(OrderStatus.Cancelled);
+                    context.OrderStatus.Add(OrderStatus.Refunded);
+                    context.OrderStatus.Add(OrderStatus.Completed);
                 }
 
                 await context.SaveChangesAsync();

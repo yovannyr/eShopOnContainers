@@ -10,9 +10,24 @@
     public class OrderStatus
         : Enumeration
     {
-        public static OrderStatus InProcess = new OrderStatus(1, nameof(InProcess).ToLowerInvariant());
-        public static OrderStatus Shipped = new OrderStatus(2, nameof(Shipped).ToLowerInvariant());
-        public static OrderStatus Canceled = new OrderStatus(3, nameof(Canceled).ToLowerInvariant());
+        /* customer started the checkout process, but did not complete it */
+        public static OrderStatus Pending = new OrderStatus(1, nameof(Pending).ToLowerInvariant());
+        /* customer has completed checkout process, but payment has yet to be confirmed */
+        public static OrderStatus AwaitingPayment  = new OrderStatus(2, nameof(AwaitingPayment).ToLowerInvariant());
+        /* customer has completed the payment but administrator has not yet record it */
+        public static OrderStatus AwaitingRecordPayment = new OrderStatus(3, nameof(AwaitingRecordPayment).ToLowerInvariant());
+        /* administrator has record de payment but he has not yet check the stock */
+        public static OrderStatus AwaitingCheckStock = new OrderStatus(4, nameof(AwaitingCheckStock).ToLowerInvariant());
+        /* stock has been successfully checked, but shipment has not been confirmed yet */
+        public static OrderStatus AwaitingShipment = new OrderStatus(5, nameof(AwaitingShipment).ToLowerInvariant());
+        /* administrator has cancelled an order, due to a stock inconsistency or other reasons.  */
+        public static OrderStatus Cancelled = new OrderStatus(6, nameof(Cancelled).ToLowerInvariant());
+        /* administrator has used the Refund action */
+        public static OrderStatus Refunded = new OrderStatus(7, nameof(Refunded).ToLowerInvariant());
+        /* order has been shipped, but receipt has not been confirmed */
+        public static OrderStatus Shipped = new OrderStatus(8, nameof(Shipped).ToLowerInvariant());
+        /*  order has been shipped/picked up, and receipt is confirmed */
+        public static OrderStatus Completed = new OrderStatus(9, nameof(Completed).ToLowerInvariant());
 
         protected OrderStatus()
         {
@@ -25,7 +40,15 @@
 
         public static IEnumerable<OrderStatus> List()
         {
-            return new[] { InProcess, Shipped, Canceled };
+            return new[] { Pending,
+                AwaitingPayment,
+                AwaitingCheckStock,
+                AwaitingRecordPayment,
+                AwaitingShipment,
+                Cancelled,
+                Refunded,
+                Shipped,
+                Completed };
         }
 
         public static OrderStatus FromName(string name)

@@ -20,9 +20,9 @@ namespace Ordering.API.Application.Commands
         [DataMember]
         public int OrderNumber { get; private set; }       
 
-        public RecordPaymentCommand(int orderId)
+        public RecordPaymentCommand(int orderNumber)
         {
-            OrderNumber = orderId;
+            OrderNumber = orderNumber;
         }
     }
 }

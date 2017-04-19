@@ -27,51 +27,6 @@ namespace Microsoft.eShopOnContainers.Services.Ordering.API.Controllers
             _identityService = identityService ?? throw new ArgumentNullException(nameof(identityService));
         }
 
-        [Route("new")]
-        [HttpPost]
-        public async Task<IActionResult> CreateOrder([FromBody]CreateOrderCommand command, [FromHeader(Name = "x-requestid")] string requestId)
-        {
-            bool result = false;
-            if (Guid.TryParse(requestId, out Guid guid) && guid != Guid.Empty)
-            {
-                var requestCreateOrder = new IdentifiedCommand<CreateOrderCommand, bool>(command, guid);
-                result = await _mediator.SendAsync(requestCreateOrder);
-            }
-            else
-            {
-                // If no x-requestid header is found we process the order anyway. This is just temporary to not break existing clients
-                // that aren't still updated. When all clients were updated this could be removed.
-                result = await _mediator.SendAsync(command);
-            }
-
-            if (result)
-            {
-                return Ok();
-            }
-
-            return BadRequest();
-        }
-
-        [Route("process")]
-        [HttpPost]
-        public async Task<IActionResult> StartOrderProcess([FromBody]StartOrderProcessCommand command, [FromHeader(Name = "x-requestid")] string requestId)
-        {
-            bool result = false;
-
-            if (Guid.TryParse(requestId, out Guid guid) && guid != Guid.Empty)
-            {
-                var requestProcessOrder = new IdentifiedCommand<StartOrderProcessCommand, bool>(command, guid);
-                result = await _mediator.SendAsync(requestProcessOrder);
-            }            
-
-            if (result)
-            {
-                return Ok();
-            }
-
-            return BadRequest();
-        }
-
         [Route("{orderId:int}")]
         [HttpGet]
         public async Task<IActionResult> GetOrder(int orderId)
@@ -107,7 +62,152 @@ namespace Microsoft.eShopOnContainers.Services.Ordering.API.Controllers
                 .GetCardTypesAsync();
 
             return Ok(cardTypes);
-        }        
+        }
+
+        [Route("new")]
+        [HttpPost]
+        public async Task<IActionResult> CreateOrder([FromBody]CreateOrderCommand command, [FromHeader(Name = "x-requestid")] string requestId)
+        {
+            bool result = false;
+            if (Guid.TryParse(requestId, out Guid guid) && guid != Guid.Empty)
+            {
+                var requestCreateOrder = new IdentifiedCommand<CreateOrderCommand, bool>(command, guid);
+                result = await _mediator.SendAsync(requestCreateOrder);
+            }
+            else
+            {
+                // If no x-requestid header is found we process the order anyway. This is just temporary to not break existing clients
+                // that aren't still updated. When all clients were updated this could be removed.
+                result = await _mediator.SendAsync(command);
+            }
+
+            if (result)
+            {
+                return Ok();
+            }
+
+            return BadRequest();
+        }
+
+        [Route("checkStock")]
+        [HttpPut]
+        public async Task<IActionResult> CheckStockOrderProcess([FromBody]CheckStockInventoryCommand command, [FromHeader(Name = "x-requestid")] string requestId)
+        {
+            bool result = false;
+
+            if (Guid.TryParse(requestId, out Guid guid) && guid != Guid.Empty)
+            {
+                var requestProcessOrder = new IdentifiedCommand<CheckStockInventoryCommand, bool>(command, guid);
+                result = await _mediator.SendAsync(requestProcessOrder);
+            }            
+
+            if (result)
+            {
+                return Ok();
+            }
+
+            return BadRequest();
+        }
+
+        [Route("recordPayment")]
+        [HttpPut]
+        public async Task<IActionResult> RecordPaymentOrderProcess([FromBody]RecordPaymentCommand command, [FromHeader(Name = "x-requestid")] string requestId)
+        {
+            bool result = false;
+
+            if (Guid.TryParse(requestId, out Guid guid) && guid != Guid.Empty)
+            {
+                var requestProcessOrder = new IdentifiedCommand<RecordPaymentCommand, bool>(command, guid);
+                result = await _mediator.SendAsync(requestProcessOrder);
+            }
+
+            if (result)
+            {
+                return Ok();
+            }
+
+            return BadRequest();
+        }
+
+        [Route("ship")]
+        [HttpPut]
+        public async Task<IActionResult> ShipOrderProcess([FromBody]ShipOrderCommand command, [FromHeader(Name = "x-requestid")] string requestId)
+        {
+            bool result = false;
+
+            if (Guid.TryParse(requestId, out Guid guid) && guid != Guid.Empty)
+            {
+                var requestProcessOrder = new IdentifiedCommand<ShipOrderCommand, bool>(command, guid);
+                result = await _mediator.SendAsync(requestProcessOrder);
+            }
+
+            if (result)
+            {
+                return Ok();
+            }
+
+            return BadRequest();
+        }
+
+        [Route("refund")]
+        [HttpPut]
+        public async Task<IActionResult> RefundOrderProcess([FromBody]RefundOrderCommand command, [FromHeader(Name = "x-requestid")] string requestId)
+        {
+            bool result = false;
+
+            if (Guid.TryParse(requestId, out Guid guid) && guid != Guid.Empty)
+            {
+                var requestProcessOrder = new IdentifiedCommand<RefundOrderCommand, bool>(command, guid);
+                result = await _mediator.SendAsync(requestProcessOrder);
+            }
+
+            if (result)
+            {
+                return Ok();
+            }
+
+            return BadRequest();
+        }
+
+        [Route("cancel")]
+        [HttpPut]
+        public async Task<IActionResult> CancelOrderProcess([FromBody]CancelOrderCommand command, [FromHeader(Name = "x-requestid")] string requestId)
+        {
+            bool result = false;
+
+            if (Guid.TryParse(requestId, out Guid guid) && guid != Guid.Empty)
+            {
+                var requestProcessOrder = new IdentifiedCommand<CancelOrderCommand, bool>(command, guid);
+                result = await _mediator.SendAsync(requestProcessOrder);
+            }
+
+            if (result)
+            {
+                return Ok();
+            }
+
+            return BadRequest();
+        }
+
+        [Route("complete")]
+        [HttpPut]
+        public async Task<IActionResult> CompleteOrderProcess([FromBody]CompleteOrderProcessCommand command, [FromHeader(Name = "x-requestid")] string requestId)
+        {
+            bool result = false;
+
+            if (Guid.TryParse(requestId, out Guid guid) && guid != Guid.Empty)
+            {
+                var requestProcessOrder = new IdentifiedCommand<CompleteOrderProcessCommand, bool>(command, guid);
+                result = await _mediator.SendAsync(requestProcessOrder);
+            }
+
+            if (result)
+            {
+                return Ok();
+            }
+
+            return BadRequest();
+        }
     }
 }
 

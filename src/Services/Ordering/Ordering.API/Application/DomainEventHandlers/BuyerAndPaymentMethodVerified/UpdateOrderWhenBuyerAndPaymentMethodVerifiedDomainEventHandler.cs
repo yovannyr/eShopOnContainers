@@ -33,7 +33,7 @@ namespace Ordering.API.Application.DomainEventHandlers.BuyerAndPaymentMethodVeri
             var orderToUpdate = await _orderRepository.GetAsync(buyerPaymentMethodVerifiedEvent.OrderId);
             orderToUpdate.SetBuyerId(buyerPaymentMethodVerifiedEvent.Buyer.Id);
             orderToUpdate.SetPaymentId(buyerPaymentMethodVerifiedEvent.Payment.Id);
-                                    
+            orderToUpdate.SetOrderStatusId(OrderStatus.AwaitingCheckStock.Id);
             var orderStartedIntegrationEvent = new OrderStartedIntegrationEvent(buyerPaymentMethodVerifiedEvent.Buyer.IdentityGuid);
 
             // Using a local transaction to achieve atomicity between original Ordering database operation and 

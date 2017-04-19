@@ -1,14 +1,12 @@
 ﻿using FluentValidation;
 using Ordering.API.Application.Commands;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using static Ordering.API.Application.Commands.StartOrderProcessCommand;
+using static Ordering.API.Application.Commands.CheckStockInventoryCommand;
 
 namespace Ordering.API.Application.Validations
 {
-    public class CreateOrderProcessCommandValidator : AbstractValidator<StartOrderProcessCommand>
+    public class CreateOrderProcessCommandValidator : AbstractValidator<CheckStockInventoryCommand>
     {
         public CreateOrderProcessCommandValidator()
         {

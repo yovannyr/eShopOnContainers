@@ -50,12 +50,11 @@
             {
                 connection.Open();
 
-                return await connection.QueryAsync<dynamic>(@"SELECT o.[Id] as ordernumber,o.[OrderDate] as [date],os.[Name] as [status],SUM(oi.units*oi.unitprice) as total, osaga.[Completed] as iscompleted
+                return await connection.QueryAsync<dynamic>(@"SELECT o.[Id] as ordernumber,o.[OrderDate] as [date],os.[Name] as [status],SUM(oi.units*oi.unitprice) as total
                      FROM [ordering].[Orders] o
                      LEFT JOIN[ordering].[orderitems] oi ON  o.Id = oi.orderid 
                      LEFT JOIN[ordering].[orderstatus] os on o.OrderStatusId = os.Id
-                     LEFT JOIN[dbo].[ordersaga] osaga ON o.Id = osaga.CorrelationId
-                     GROUP BY o.[Id], o.[OrderDate], os.[Name], osaga.[Completed]");
+                     GROUP BY o.[Id], o.[OrderDate], os.[Name]");
             }
         }
 

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.eShopOnContainers.Services.Ordering.Domain.Seedwork;
 using Ordering.Domain.SagaData;
 using System;
 using System.Collections.Generic;
@@ -7,46 +8,24 @@ using System.Threading.Tasks;
 
 namespace Ordering.API.Application.Sagas
 {
-    public abstract class Saga<TEntity> where TEntity : class, ISagaEntity
+    public abstract class Saga<TEntity> where TEntity : Entity
     {
-        public Saga()
+        private readonly DbContext _dbContext;
+        public Saga(DbContext dbContext)
         {
+            _dbContext = dbContext;
         }
 
-        protected TEntity FindSagaById(int id, DbContext context)
+        protected TEntity FindSagaById(int id, DbContext context = null)
         {
-            return context.Set<TEntity>().Where(x => x.CorrelationId == id).SingleOrDefault();
+            var ctx = context ?? _dbContext;
+            return ctx.Set<TEntity>().Where(x => x.Id == id).SingleOrDefault();
         }
 
-        protected bool ExistSaga(int sagaId, DbContext context)
+        protected async Task<bool> SaveChangesAsync(DbContext context = null)
         {
-            var saga = FindSagaById(sagaId, context);
-            return saga != null;
-        }
-
-        protected void MarkSagaAsCompleted(TEntity item)
-        {
-            item.Completed = true;
-        }
-
-        protected void MarkAsCancelled(TEntity item)
-        {
-            item.Cancelled = true;
-        }
-
-        protected void AddSaga(TEntity item, DbContext context)
-        {
-            context.Add(item);
-        }
-
-        protected void UpdateSaga(TEntity item, DbContext context)
-        {
-            context.Update(item);
-        }
-
-        protected async Task<bool> SaveChangesAsync(DbContext context)
-        {
-            var result = await context.SaveChangesAsync();
+            var ctx = context ?? _dbContext;
+            var result = await ctx.SaveChangesAsync();
             return result > 0;
         }
     }

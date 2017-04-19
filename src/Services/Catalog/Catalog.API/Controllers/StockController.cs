@@ -1,11 +1,9 @@
-﻿using Catalog.API.Application.Commands;
-using MediatR;
+﻿using Catalog.API.IntegrationEvents;
+using Catalog.API.IntegrationEvents.Events;
+using Catalog.API.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.eShopOnContainers.Services.Catalog.API;
 using Microsoft.eShopOnContainers.Services.Catalog.API.Infrastructure;
-using Microsoft.Extensions.Options;
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -17,32 +15,48 @@ namespace Catalog.API.Controllers
     public class StockController : ControllerBase
     {
         private readonly CatalogContext _catalogContext;
-        private readonly IOptionsSnapshot<Settings> _settings;
-        private readonly IMediator _mediator;
+        private readonly ICatalogIntegrationEventService _catalogIntegrationEventService;
 
         public StockController(
-            CatalogContext Context, IOptionsSnapshot<Settings> settings, IMediator mediator)
+            CatalogContext Context,
+            ICatalogIntegrationEventService catalogIntegrationEventService)
         {
             _catalogContext = Context;
-            _settings = settings;
-            _mediator = mediator;
-
+            _catalogIntegrationEventService = catalogIntegrationEventService;
             ((DbContext)Context).ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
         }
 
         //PUT api/v1/[controller]/stocktoremovefromproducts
         [Route("stocktoremovefromproducts")]
         [HttpPut]
-        public async Task<IActionResult> RemoveStockFromProducs([FromBody]RemoveStockFromProducsCommand command, [FromHeader(Name = "x-requestid")] string requestId)
+        public async Task<IActionResult> RemoveStockFromProducs([FromBody]OrderedItems orderedItems)
         {
-            bool result = false;
-            if (Guid.TryParse(requestId, out Guid guid) && guid != Guid.Empty)
-            {
-                var requestCreateStock = new IdentifiedCommand<RemoveStockFromProducsCommand, bool>(command, guid);
-                result = await _mediator.SendAsync(requestCreateStock);
-            }            
+            var ids = orderedItems.OrderItems.Select(i => i.ProductId);
+            var productsToUpdate = _catalogContext.CatalogItems
+                .Where(c => ids.Contains(c.Id))
+                .ToList();
 
-            if (result)
+            // Remove number of products provided from stock
+            productsToUpdate.ForEach((productToUpdate) => {
+                foreach (var item in orderedItems.OrderItems)
+                {
+                    if (item.ProductId == productToUpdate.Id)
+                    {
+                        productToUpdate.RemoveStock(item.Units);
+                        _catalogContext.Update(productToUpdate);
+                        break;
+                    }
+                };
+            });
+            var result = await _catalogContext.SaveChangesAsync();
+            var isSuccess = result > 0;
+
+            // Send Integration event to ordering api in order to update order saga status            
+            var evt = new StockCheckedIntegrationEvent(orderedItems.OrderNumber, isSuccess);
+            await _catalogIntegrationEventService.SaveEventAndCatalogContextChangesAsync(evt);
+            await _catalogIntegrationEventService.PublishThroughEventBusAsync(evt);
+
+            if (isSuccess)
             {
                 return Ok();
             }
