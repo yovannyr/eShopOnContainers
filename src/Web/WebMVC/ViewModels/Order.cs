@@ -1,4 +1,5 @@
-﻿using Microsoft.eShopOnContainers.WebMVC.ViewModels.Annotations;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.eShopOnContainers.WebMVC.ViewModels.Annotations;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -6,6 +7,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using WebMVC.ViewModels;
 
 namespace Microsoft.eShopOnContainers.WebMVC.ViewModels
 {
@@ -31,6 +33,10 @@ namespace Microsoft.eShopOnContainers.WebMVC.ViewModels
         public string Country { get; set; }
 
         public string ZipCode { get; set; }
+
+        public List<SelectListItem> ActionCodeSelectList => 
+            GetActionCodesByCurrentState();
+
         [Required]
         [DisplayName("Card number")]
         public string CardNumber { get; set; }
@@ -72,10 +78,41 @@ namespace Microsoft.eShopOnContainers.WebMVC.ViewModels
 
             CardExpiration = new DateTime(int.Parse(year), int.Parse(month), 1);
         }
+
+        private List<SelectListItem> GetActionCodesByCurrentState()
+        {            
+            var actions = new List<OrderProcessAction>();
+            switch (Status)
+            {
+                case "awaitingcheckstock":
+                    actions.Add(OrderProcessAction.CheckStock);
+                    break;
+                case "awaitingrecordpayment":
+                    actions.Add(OrderProcessAction.RecordPayment);
+                    break;                
+                case "awaitingshipment":
+                    actions.Add(OrderProcessAction.Ship);
+                    actions.Add(OrderProcessAction.Refund);
+                    break;
+                case "shipped":
+                    actions.Add(OrderProcessAction.Refund);
+                    actions.Add(OrderProcessAction.Complete);
+                    break;                
+            }
+            actions.Add(OrderProcessAction.Cancel);
+
+            var result = new List<SelectListItem>();
+            actions.ForEach(action =>
+            {
+                result.Add(new SelectListItem { Text = action.Name, Value = action.Code });
+            });
+            
+            return result;            
+        }
     }
 
     public enum CardType
     {
         AMEX = 1
-    }
+    }    
 }
