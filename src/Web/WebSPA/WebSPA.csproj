@@ -16,6 +16,8 @@
 
   <ItemGroup>
     <Compile Remove="node_modules\**\*;Client\**\*" />
+    <None Remove="Setup\images.zip" />
+    <Content Include="Setup\images.zip" />
     <Content Update="appsettings.json;">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>

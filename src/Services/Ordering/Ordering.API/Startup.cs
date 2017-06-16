@@ -82,6 +82,8 @@
                         ServiceLifetime.Scoped  //Showing explicitly that the DbContext is shared across the HTTP request scope (graph of objects started in the HTTP request)
                     );
 
+            services.Configure<OrderingSettings>(Configuration);
+
             services.AddSwaggerGen(options =>
             {
                 options.DescribeAllEnumsAsStrings();
@@ -156,7 +158,7 @@
                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
                });
 
-            OrderingContextSeed.SeedAsync(app).Wait();
+            OrderingContextSeed.SeedAsync(app, env, loggerFactory).Wait();
 
             var integrationEventLogContext = new IntegrationEventLogContext(
                 new DbContextOptionsBuilder<IntegrationEventLogContext>()

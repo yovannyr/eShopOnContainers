@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.HealthChecks;
 using Newtonsoft.Json.Serialization;
 using eShopOnContainers.WebSPA;
+using WebSPA.Infrastructure;
 
 namespace eShopConContainers.WebSPA
 {
@@ -93,6 +94,9 @@ namespace eShopConContainers.WebSPA
             //     }
             //     await next.Invoke();
             // });
+            
+            //Seed Data
+            WebContextSeed.Seed(app, env, loggerFactory);
 
             app.Use(async (context, next) =>
             {

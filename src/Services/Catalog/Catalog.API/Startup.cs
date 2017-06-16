@@ -147,7 +147,9 @@
             WaitForSqlAvailability(context, loggerFactory);
 
             //Seed Data
-            CatalogContextSeed.SeedAsync(app, loggerFactory)
+            //var settings = app.ApplicationServices.GetRequiredService<IOptions<CatalogSettings>>().Value;
+            //Boolean.TryParse(Configuration["UseCustomizationData"], out bool useCustomizationData);
+            CatalogContextSeed.SeedAsync(app, env, loggerFactory /*, useCustomizationData*/)
                 .Wait();
 
             var integrationEventLogContext = new IntegrationEventLogContext(

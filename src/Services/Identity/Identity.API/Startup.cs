@@ -136,7 +136,7 @@ namespace eShopOnContainers.Identity
 
             //Seed Data
             var hasher = new PasswordHasher<ApplicationUser>();
-            new ApplicationContextSeed(hasher).SeedAsync(app, loggerFactory)
+            new ApplicationContextSeed(hasher).SeedAsync(app, env, loggerFactory)
             .Wait();
         }
     }

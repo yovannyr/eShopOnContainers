@@ -9,6 +9,14 @@
     <DockerComposeProjectPath>..\..\..\docker-compose.dcproj</DockerComposeProjectPath>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Remove="Setup\images.zip" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Setup\images.zip" />
+  </ItemGroup>
+
   <!--<ItemGroup>
     <Compile Remove="wwwroot\lib\bootstrap\**" />
     <Content Remove="wwwroot\lib\bootstrap\**" />
