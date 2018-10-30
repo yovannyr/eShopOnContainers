@@ -1,23 +1,22 @@
-using Android.App;
-using Android.OS;
-using Android.Content.PM;
-using Android.Views;
-using Xamarin.Forms.Platform.Android;
-using FFImageLoading.Forms.Droid;
 using Acr.UserDialogs;
+using Android.App;
 using Android.Content;
+using Android.Content.PM;
+using Android.OS;
 using Android.Runtime;
+using Android.Views;
 using FFImageLoading;
+using FFImageLoading.Forms.Droid;
 using System;
-using Plugin.Permissions;
+using Xamarin.Forms.Platform.Android;
+using eShopOnContainers.Droid.Services;
 
 namespace eShopOnContainers.Droid.Activities
 {
     [Activity(
-        Label = "eShopOnContainers", 
+        Label = "eShopOnContainers",
         Icon = "@drawable/icon",
         Theme = "@style/MainTheme",
-        MainLauncher = true,
         ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
     public class MainActivity : FormsAppCompatActivity
     {
@@ -35,11 +34,8 @@ namespace eShopOnContainers.Droid.Activities
 
             global::Xamarin.Forms.Forms.Init(this, bundle);
             UserDialogs.Init(this);
-            CachedImageRenderer.Init();
+            CachedImageRenderer.Init(false);
             LoadApplication(new App());
-
-            var x = typeof(Xamarin.Forms.Themes.LightThemeResources);
-            x = typeof(Xamarin.Forms.Themes.Android.UnderlineEffect);
 
             Window window = this.Window;
             window.ClearFlags(WindowManagerFlags.TranslucentStatus);
@@ -60,7 +56,8 @@ namespace eShopOnContainers.Droid.Activities
 
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, Permission[] grantResults)
         {
-            PermissionsImplementation.Current.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+            base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+            ((PermissionsService)PermissionsService.Instance).OnRequestPermissionResult(requestCode, permissions, grantResults);
         }
     }
 }

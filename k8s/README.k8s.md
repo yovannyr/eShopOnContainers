@@ -4,10 +4,23 @@ The k8s directory contains Kubernetes configuration for the eShopOnContainers ap
 ## Prerequisites
 * A Kubernetes cluster. Follow Azure Container Service's [walkthrough](https://docs.microsoft.com/en-us/azure/container-service/container-service-kubernetes-walkthrough) to create one. 
 * A private Docker registry. Follow Azure Container Registry's [guide](https://docs.microsoft.com/en-us/azure/container-registry/container-registry-get-started-portal) to create one.
-* Optionally, previous steps can be skipped if you run gen-k8s-env.ps1 script to automatically create the azure environment needed for kubernetes deployment. Azure cli 2.0 must be previously installed [installation guide](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli). For example:
+* Optionally, previous steps can be skipped if you run the **gen-k8s-env-aks.ps1** script to create an AKS cluster environment or gen-k8s-env.ps1 script to create an ACS for Kuberentes cluster environment including the creation of additional Azure environment needed like an Azure Resource Manager and ACR registry. 
+
+Azure cli 2.0 must be previously installed [installation guide](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli). For example:
+
+    **Important**: Note the parameter "-createAcr true". If you are creating the K8s cluster but you want to re-use and existing ACR, say "-createAcr false".
+
+
+For AKS:
 
 >```
->./gen-k8s-env -resourceGroupName k8sGroup -location westeurope -registryName k8sregistry -orchestratorName k8s-cluster -dnsName k8s-dns
+>./gen-k8s-env-aks -resourceGroupName YoureShopAksResgroup -location centralus -serviceName YoureShopAksCluster -dnsNamePrefix youreshopaks -registryName YoureShopAcrRegistry -createAcr true -nodeCount 3 -nodeVMSize Standard_D2_v2
+>```
+
+For ACS:
+
+>```
+>./gen-k8s-env -resourceGroupName k8sGroup -location westeurope -registryName k8sregistry -createAcr true -orchestratorName k8s-cluster -dnsName k8s-dns
 >```
 
 * A Docker development environment with `docker` and `docker-compose`.
@@ -27,18 +40,18 @@ The k8s directory contains Kubernetes configuration for the eShopOnContainers ap
 Once the user and password are retrieved, run the following script for deployment. For example:
 
 >```
->./deploy.ps1 -registry myregistry.azurecr.io -dockerUser User -dockerPassword SecretPassword -configFile file_with_config.json
+>./deploy.ps1 -registry myregistry.azurecr.io -dockerUser User -dockerPassword SecretPassword -configFile file_with_config.yaml
 >```
 
-The parameter `configFile` is important (and mandatory) because it contains the configuration used for the Pods in Kubernetes. This allow deploying Pods that use your own resources in Azure or any other cloud provider. A configuration file `local.json` is provided which configures Pods to use the infrastructure containers (that is sql server, rabbitmq, redis and mongodb must be deployed also in the k8s).
+The parameter `configFile` is important (and mandatory) because it contains the configuration used for the Pods in Kubernetes. This allow deploying Pods that use your own resources in Azure or any other cloud provider. A configuration file `conf_local.yaml` is provided which configures Pods to use the infrastructure containers (that is sql server, rabbitmq, redis and mongodb must be deployed also in the k8s).
 
 The script will build the code and corresponding Docker images, push the later to your registry, and deploy the application to your cluster. You can watch the deployment unfold from the Kubernetes web interface: run `kubectl proxy` and open a browser to [http://localhost:8001/ui](http://localhost:8001/ui)
 
 ### Pods configuration file
 
-When deploying to k8s the script needs the `configFile` with the location of a JSON configuration file. This file contains the configuration of the pods. The file is a JSON file. For reference another configuration file (cloud.json) is provided but without valid values.
+When deploying to k8s the script needs the `configFile` parameter with the location of the YAML configuration file. This file contains the configuration of the pods. The file is a .YAML file. For reference another configuration file (conf_cloud.yaml) is provided but without valid values.
 
-If you deploy the infrastructure containers use `local.json` as a value for `configFile` parameter. If you don't deploy the infrastructure containers use your own configuration file with the correct values.
+If you deploy the infrastructure containers use `conf_local.yaml` as a value for `configFile` parameter. If you don't deploy the infrastructure containers use your own configuration file with the correct values.
 
 ### Parameters of the deploy.ps1 script
 
@@ -57,6 +70,12 @@ The script accepts following parameters:
 + `buildImages`: If `true` (default value) Docker images are built and pushed in the Docker registry. If you set this parameter to `false`, Docker images won't be built nor pushed in the Docker registry (but k8s' deployments and services will be redeployed).
 + `deployInfrastructure`: If `true` infrastructure containers (rabbitmq, mongo, redis, sql) will be deployed in k8s. If `false` those containers (and its related deployments and services in k8s) won't be deployed.
 + `dockerOrg`: Name of the organization in the registry where the images are (or will be pushed). Default value is `eshop` (which has images provided by Microsoft)
+
+**Important:** If you **don't pass the `-buildBits $true` the script won't build and publish the projects** to their `obj/Docker/publish` folder. If any project is not published, you'll be receiving errors like:
+
+```
+ERROR: Service 'xxxxxxx' failed to build: COPY failed: stat /var/lib/docker/tmp/docker-builder123456789/obj/Docker/publish: no such file or directory
+```
 
 ### Typical usages of the script:
 

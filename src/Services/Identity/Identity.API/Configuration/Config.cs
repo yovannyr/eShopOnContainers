@@ -2,7 +2,7 @@
 using IdentityServer4.Models;
 using System.Collections.Generic;
 
-namespace Identity.API.Configuration
+namespace Microsoft.eShopOnContainers.Services.Identity.API.Configuration
 {
     public class Config
     {
@@ -14,7 +14,10 @@ namespace Identity.API.Configuration
                 new ApiResource("orders", "Orders Service"),
                 new ApiResource("basket", "Basket Service"),
                 new ApiResource("marketing", "Marketing Service"),
-                new ApiResource("locations", "Locations Service")
+                new ApiResource("locations", "Locations Service"),
+                new ApiResource("mobileshoppingagg", "Mobile Shopping Aggregator"),
+                new ApiResource("webshoppingagg", "Web Shopping Aggregator"),
+                new ApiResource("orders.signalrhub", "Ordering Signalr Hub")
             };
         }
 
@@ -52,8 +55,10 @@ namespace Identity.API.Configuration
                         "orders",
                         "basket",
                         "locations",
-                        "marketing"
-                    }
+                        "marketing",
+                        "webshoppingagg",
+                        "orders.signalrhub"
+                    },
                 },
                 new Client
                 {
@@ -67,6 +72,7 @@ namespace Identity.API.Configuration
                     },
                     RedirectUris = { clientsUrl["Xamarin"] },
                     RequireConsent = false,
+                    RequirePkce = true,
                     PostLogoutRedirectUris = { $"{clientsUrl["Xamarin"]}/Account/Redirecting" },
                     AllowedCorsOrigins = { "http://eshopxamarin" },
                     AllowedScopes = new List<string>
@@ -77,7 +83,8 @@ namespace Identity.API.Configuration
                         "orders",
                         "basket",
                         "locations",
-                        "marketing"
+                        "marketing",
+                        "mobileshoppingagg"
                     },
                     //Allow requesting refresh tokens for long lived API access
                     AllowOfflineAccess = true,
@@ -96,6 +103,7 @@ namespace Identity.API.Configuration
                     AllowAccessTokensViaBrowser = false,
                     RequireConsent = false,
                     AllowOfflineAccess = true,
+                    AlwaysIncludeUserClaimsInIdToken = true,
                     RedirectUris = new List<string>
                     {
                         $"{clientsUrl["Mvc"]}/signin-oidc"
@@ -112,8 +120,12 @@ namespace Identity.API.Configuration
                         "orders",
                         "basket",
                         "locations",
-                        "marketing"
+                        "marketing",
+                        "webshoppingagg",
+                        "orders.signalrhub"
                     },
+                    AccessTokenLifetime = 60*60*2, // 2 hours
+                    IdentityTokenLifetime= 60*60*2 // 2 hours
                 },
                 new Client
                 {
@@ -144,7 +156,8 @@ namespace Identity.API.Configuration
                         "orders",
                         "basket",
                         "locations",
-                        "marketing"
+                        "marketing",
+                        "webshoppingagg"
                     },
                 },
                 new Client
@@ -154,7 +167,7 @@ namespace Identity.API.Configuration
                     AllowedGrantTypes = GrantTypes.Implicit,
                     AllowAccessTokensViaBrowser = true,
 
-                    RedirectUris = { $"{clientsUrl["LocationsApi"]}/swagger/o2c.html" },
+                    RedirectUris = { $"{clientsUrl["LocationsApi"]}/swagger/oauth2-redirect.html" },
                     PostLogoutRedirectUris = { $"{clientsUrl["LocationsApi"]}/swagger/" },
 
                     AllowedScopes =
@@ -169,7 +182,7 @@ namespace Identity.API.Configuration
                     AllowedGrantTypes = GrantTypes.Implicit,
                     AllowAccessTokensViaBrowser = true,
 
-                    RedirectUris = { $"{clientsUrl["MarketingApi"]}/swagger/o2c.html" },
+                    RedirectUris = { $"{clientsUrl["MarketingApi"]}/swagger/oauth2-redirect.html" },
                     PostLogoutRedirectUris = { $"{clientsUrl["MarketingApi"]}/swagger/" },
 
                     AllowedScopes =
@@ -184,7 +197,7 @@ namespace Identity.API.Configuration
                     AllowedGrantTypes = GrantTypes.Implicit,
                     AllowAccessTokensViaBrowser = true,
 
-                    RedirectUris = { $"{clientsUrl["BasketApi"]}/swagger/o2c.html" },
+                    RedirectUris = { $"{clientsUrl["BasketApi"]}/swagger/oauth2-redirect.html" },
                     PostLogoutRedirectUris = { $"{clientsUrl["BasketApi"]}/swagger/" },
 
                     AllowedScopes =
@@ -199,12 +212,42 @@ namespace Identity.API.Configuration
                     AllowedGrantTypes = GrantTypes.Implicit,
                     AllowAccessTokensViaBrowser = true,
 
-                    RedirectUris = { $"{clientsUrl["OrderingApi"]}/swagger/o2c.html" },
+                    RedirectUris = { $"{clientsUrl["OrderingApi"]}/swagger/oauth2-redirect.html" },
                     PostLogoutRedirectUris = { $"{clientsUrl["OrderingApi"]}/swagger/" },
 
                     AllowedScopes =
                     {
                         "orders"
+                    }
+                },
+                new Client
+                {
+                    ClientId = "mobileshoppingaggswaggerui",
+                    ClientName = "Mobile Shopping Aggregattor Swagger UI",
+                    AllowedGrantTypes = GrantTypes.Implicit,
+                    AllowAccessTokensViaBrowser = true,
+
+                    RedirectUris = { $"{clientsUrl["MobileShoppingAgg"]}/swagger/oauth2-redirect.html" },
+                    PostLogoutRedirectUris = { $"{clientsUrl["MobileShoppingAgg"]}/swagger/" },
+
+                    AllowedScopes =
+                    {
+                        "mobileshoppingagg"
+                    }
+                },
+                new Client
+                {
+                    ClientId = "webshoppingaggswaggerui",
+                    ClientName = "Web Shopping Aggregattor Swagger UI",
+                    AllowedGrantTypes = GrantTypes.Implicit,
+                    AllowAccessTokensViaBrowser = true,
+
+                    RedirectUris = { $"{clientsUrl["WebShoppingAgg"]}/swagger/oauth2-redirect.html" },
+                    PostLogoutRedirectUris = { $"{clientsUrl["WebShoppingAgg"]}/swagger/" },
+
+                    AllowedScopes =
+                    {
+                        "webshoppingagg"
                     }
                 }
             };

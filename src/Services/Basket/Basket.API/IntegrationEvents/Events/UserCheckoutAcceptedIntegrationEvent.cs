@@ -1,15 +1,14 @@
 ﻿using Microsoft.eShopOnContainers.BuildingBlocks.EventBus.Events;
 using Microsoft.eShopOnContainers.Services.Basket.API.Model;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Basket.API.IntegrationEvents.Events
 {
     public class UserCheckoutAcceptedIntegrationEvent : IntegrationEvent
     {
         public string UserId { get; }
+
+        public string UserName { get; }
 
         public int OrderNumber { get; set; }
 
@@ -39,12 +38,13 @@ namespace Basket.API.IntegrationEvents.Events
 
         public CustomerBasket Basket { get; }
 
-        public UserCheckoutAcceptedIntegrationEvent(string userId, string city, string street,
+        public UserCheckoutAcceptedIntegrationEvent(string userId, string userName, string city, string street,
             string state, string country, string zipCode, string cardNumber, string cardHolderName,
             DateTime cardExpiration, string cardSecurityNumber, int cardTypeId, string buyer, Guid requestId,
             CustomerBasket basket)
         {
             UserId = userId;
+            UserName = userName;
             City = city;
             Street = street;
             State = state;
